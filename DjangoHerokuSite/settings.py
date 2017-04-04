@@ -111,6 +111,10 @@ USE_TZ = True
 
 # Update database configuration with $DATABASE_URL.
 db_from_env = dj_database_url.config(conn_max_age=500)
+for x in db_from_env:
+    print (x)
+    for y in db_from_env[x]:
+        print (y,':',db_from_env[x][y])
 DATABASES['default'].update(db_from_env)
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
