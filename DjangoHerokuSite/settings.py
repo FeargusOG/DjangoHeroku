@@ -32,6 +32,7 @@ DEBUG = True
 
 INSTALLED_APPS = [
     'polls.apps.PollsConfig',
+    'psnvalue.apps.PsnvalueConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
