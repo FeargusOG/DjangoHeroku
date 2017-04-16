@@ -24,6 +24,7 @@ class GameList(models.Model):
     json_url = models.TextField()
     image_url = models.TextField()
     age_rating = models.IntegerField(default=0)
+    library_name = models.OneToOneField(Library, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.game_id + ": " + self.game_name
