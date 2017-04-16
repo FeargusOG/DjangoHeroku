@@ -1,12 +1,22 @@
+import datetime
+
 from django.db import models
+from django.utils import timezone
+
+def last_day_timedate():
+    return timezone.now() - datetime.timedelta(days=1)
 
 class Library(models.Model):
     library_name = models.TextField(unique=True)
     last_updated = models.DateTimeField()
     total_results = models.IntegerField()
+    library_url = models.TextField()
 
     def __str__(self):
         return self.library_name
+
+    def was_updated_within_last_day(self):
+        return self.last_updated >= last_day_timedate()
 
 class GameList(models.Model):
     game_id = models.TextField(unique=True)
@@ -28,6 +38,9 @@ class GamePrice(models.Model):
     def __str__(self):
         return self.game_id
 
+    def was_updated_within_last_day(self):
+        return self.last_updated >= last_day_timedate()
+
 class GameRatings(models.Model):
     game_id = models.OneToOneField(GameList, on_delete=models.CASCADE)
     last_updated = models.DateTimeField()
@@ -40,6 +53,9 @@ class GameRatings(models.Model):
 
     def __str__(self):
         return self.game_id
+
+    def was_updated_within_last_day(self):
+        return self.last_updated >= last_day_timedate()
 
 class GameValue(models.Model):
     game_id = models.OneToOneField(GameList, on_delete=models.CASCADE)
