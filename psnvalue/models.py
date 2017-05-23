@@ -24,7 +24,7 @@ class GameList(models.Model):
     json_url = models.TextField()
     image_url = models.TextField()
     age_rating = models.IntegerField(default=0)
-    library_name = models.OneToOneField(Library, on_delete=models.CASCADE)
+    library_name = models.ForeignKey(Library, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.game_id + ": " + self.game_name
@@ -45,12 +45,8 @@ class GamePrice(models.Model):
 class GameRatings(models.Model):
     game_id = models.OneToOneField(GameList, on_delete=models.CASCADE)
     last_updated = models.DateTimeField()
-    psn_rating = models.FloatField(default=0.0)
-    psn_rating_count = models.IntegerField(default=0)
-    mcritic_critic_rating = models.FloatField(default=0.0)
-    mcritic_critic_rating_count = models.IntegerField(default=0)
-    mcritic_user_rating = models.FloatField(default=0.0)
-    mcritic_user_rating_count = models.IntegerField(default=0)
+    rating = models.FloatField(default=0.0)
+    rating_count = models.IntegerField(default=0)
 
     def __str__(self):
         return self.game_id
