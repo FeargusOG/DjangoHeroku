@@ -3,7 +3,7 @@ import requests
 import collections
 
 from django.utils import timezone
-from .models import Library, GameList, GamePrice
+from .models import Library, GameList, GamePrice, GameRatings, GameValue
 
 #PSN Each Game JSON element
 PSN_JSON_ELEM_EACH_GAME = 'links'
@@ -41,6 +41,12 @@ PSN_JSON_ELEM_GAME_REWARDS = 'rewards'
 PSN_JSON_ELEM_GAME_BASE_DISCOUNT = 'discount'
 #PSN PS Plus Discount JSON element - part of the full game details json!
 PSN_JSON_ELEM_GAME_BONUS_DISCOUNT = 'bonus_discount'
+#PSN Game Rating Parent Block - part of the full game details json!
+PSN_JSON_ELEM_GAME_RATING_BLOCK = 'star_rating'
+#PSN Game Rating Parent Block - part of the full game details json!
+PSN_JSON_ELEM_GAME_RATING_VALUE = 'score'
+#PSN Game Rating Parent Block - part of the full game details json!
+PSN_JSON_ELEM_GAME_RATING_COUNT = 'total'
 
 
 def update_library(p_library_id):
@@ -86,30 +92,65 @@ def add_psn_full_game_details(p_game_entry):
     set_game_age_rating(p_game_entry, g_age)
     #Add a GamePrice entry
     g_price = full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_BASE_PRICE]
-    print("Price: ", g_price)
-    discount_tuple = get_psn_game_discounts(full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
-    #g_base_discount = full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
-    print("Base Discount: ", discount_tuple.base)
-    #g_plus_discount = full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_DISCOUNT]
-    print("Plus Discount: ", discount_tuple.plus)
-    #add_game_price_entry(p_game_entry, g_price, 10, 20)
+    g_discount_tuple = get_psn_game_discounts(full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
+    add_game_price_entry(p_game_entry, g_price, g_discount_tuple.base, g_discount_tuple.plus)
+    #Add a GameRatings entry
+    add_psn_game_ratings(p_game_entry, full_details_json[PSN_JSON_ELEM_GAME_RATING_BLOCK])
+    #Add a GameValue entry
+    add_psn_game_value(p_game_entry)
 
 def get_psn_game_discounts(p_game_price_block_json):
     psn_discounts = collections.namedtuple('psn_discounts', ['base', 'plus'])
     base_discount = 10
     plus_discount = 10
     if PSN_JSON_ELEM_GAME_REWARDS in p_game_price_block_json:
-        print("REWARDS!")
         if PSN_JSON_ELEM_GAME_BASE_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
             base_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
         if PSN_JSON_ELEM_GAME_BONUS_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
             plus_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_DISCOUNT]
-    else:
-        print("NO REWARDS!")
+
     return psn_discounts(base=base_discount,plus=plus_discount)
+
+def add_psn_game_ratings(p_game_entry, p_game_rating_block_json):
+    add_game_rating_entry(p_game_entry, p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE], p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT])
+
+def add_game_rating_entry(p_game_entry, p_rating_value, p_rating_count):
+    return GameRatings.objects.create(game_id=p_game_entry, last_updated=timezone.now(), psn_rating=p_rating_value, psn_rating_count=p_rating_count)
 
 def add_game_price_entry(p_game_entry, p_price, p_base_discount, p_plus_discount):
     return GamePrice.objects.create(game_id=p_game_entry, last_updated=timezone.now(), base_price=p_price, base_discount=p_base_discount, plus_discount=p_plus_discount)
+
+def add_psn_game_value(p_game_entry):
+    g_rating = get_game_rating(p_game_entry)
+    g_price = get_game_price(p_game_entry)
+    print("Rating: ", g_rating)
+    print("Price: ", g_price)
+    #Calculate the value for this game
+
+    #Add entry to DB for this game value
+
+def calculate_game_value(p_game_rating, p_game_price):
+    return 1
+
+def get_game_price(p_game_entry):
+    g_game_price_obj = GamePrice.objects.get(game_id=p_game_entry)
+    g_game_price = g_game_price_obj.base_price
+
+    if(g_game_price_obj.plus_discount > 0):
+        g_game_price = apply_game_discount(g_game_price, g_game_price_obj.plus_discount)
+    elif(g_game_price_obj.base_discount > 0):
+        g_game_price = apply_game_discount(g_game_price, g_game_price_obj.base_discount)
+
+    return g_game_price
+
+def apply_game_discount(p_base_price, p_discount_percentage):
+    return ((p_base_price*(100-p_discount_percentage))/100)
+
+def get_game_rating(p_game_entry):
+    return GameRatings.objects.get(game_id=p_game_entry).psn_rating
+
+def add_game_value_entry(p_game_entry, p_game_value):
+    return GameValue.objects.create(game_id=p_game_entry, value_score=p_game_value)
 
 def set_game_age_rating(p_game_entry, p_new_age_rating):
     p_game_entry.age_rating = p_new_age_rating
