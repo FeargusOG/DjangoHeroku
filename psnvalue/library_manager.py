@@ -126,11 +126,15 @@ def add_psn_game_value(p_game_entry):
     print("Rating: ", g_rating)
     print("Price: ", g_price)
     #Calculate the value for this game
-
+    g_val = calculate_game_value(g_rating, g_price)
+    print("Value: ", g_val)
     #Add entry to DB for this game value
+    add_game_value_entry(p_game_entry, g_val)
 
 def calculate_game_value(p_game_rating, p_game_price):
-    return 1
+    fixed_price = round(p_game_price)
+    fixed_rating = p_game_rating * 100
+    return round((fixed_price/fixed_rating)*100)
 
 def get_game_price(p_game_entry):
     g_game_price_obj = GamePrice.objects.get(game_id=p_game_entry)
