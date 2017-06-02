@@ -4,14 +4,21 @@ import collections
 
 from psycopg2 import IntegrityError
 from django.utils import timezone
+from datetime import datetime
 from .models import Library, GameList, GamePrice, GameRatings, GameValue
 
+#PSN Library Name
+PSN_MODEL_LIBRARY_NAME = 'PS4'
+#PSN Library Total Results
+PSN_JSON_ELEM_TOTAL_RESULTS = 'total_results'
 #PSN Each Game JSON element
 PSN_JSON_ELEM_EACH_GAME = 'links'
 #PSN Sub-Base Game JSON element i.e. bundles etc.
 PSN_JSON_ELEM_SUB_GAME = 'parent_name'
 #PSN TODO Maybe use this for identifying full games
 PSN_JSON_ELEM_FULL_GAME = 'Full Game'
+#PSN Game release date
+PSN_JSON_ELEM_RELEASE_DATE = 'release_date'
 #PSN Game ID JSON element
 PSN_JSON_ELEM_GAME_ID = 'id'
 #PSN Game Name JSON element
@@ -58,23 +65,32 @@ def update_library(p_library_id):
 def update_psn_lib(p_library_id):
     count_of_base_games = 0
     psn_lib_json = get_psn_lib_json()
-
+    count = 0
     for eachGame in psn_lib_json[PSN_JSON_ELEM_EACH_GAME]:
         # We're just looking for base games i.e. ignore bundles etc.
         # If a game is on sale, the bundle is (always?) on sale too.
         # Maybe we shouldn't be.... Do some tests on this.
         if PSN_JSON_ELEM_SUB_GAME in eachGame:
+            #print("Game is not full game! - ", eachGame[PSN_JSON_ELEM_GAME_NAME])
+            continue
+
+        # Check to make sure the game is released - otherwise we
+        # can get games without prices etc.
+        if(game_is_released(eachGame) == False):
+            #print("Game is not released! - ", eachGame[PSN_JSON_ELEM_GAME_NAME])
             continue
 
         # We found a base game, so parse the details
         count_of_base_games += 1
         if(game_exists_in_db(p_library_id, eachGame[PSN_JSON_ELEM_GAME_ID])):
-            print("Game exists")
+            print("Game exists: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
         else:
-            print("Game doesn't exist")
+            print("Game doesn't exist: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
             add_psn_game(p_library_id, eachGame)
-        
-        break
+
+        count += 1
+        if count == 3:
+            break
 
 def add_psn_game(p_library_id, p_base_game_json):
     g_id = p_base_game_json[PSN_JSON_ELEM_GAME_ID]
@@ -103,9 +119,10 @@ def add_psn_full_game_details(p_game_entry):
 
 def get_psn_game_discounts(p_game_price_block_json):
     psn_discounts = collections.namedtuple('psn_discounts', ['base', 'plus'])
-    base_discount = 10
-    plus_discount = 10
-    if PSN_JSON_ELEM_GAME_REWARDS in p_game_price_block_json:
+    base_discount = 0
+    plus_discount = 0
+    if (PSN_JSON_ELEM_GAME_REWARDS in p_game_price_block_json) and (p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]):
+        print(type(p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]))
         if PSN_JSON_ELEM_GAME_BASE_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
             base_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
         if PSN_JSON_ELEM_GAME_BONUS_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
@@ -136,7 +153,8 @@ def add_psn_game_value(p_game_entry):
 def calculate_game_value(p_game_rating, p_game_price):
     fixed_price = round(p_game_price)
     fixed_rating = p_game_rating * 100
-    return round((fixed_price/fixed_rating)*100)
+    return round(1/(fixed_price/fixed_rating)*1000)
+    #return round((fixed_price/fixed_rating)*100)
 
 def get_game_price(p_game_entry):
     g_game_price_obj = GamePrice.objects.get(game_id=p_game_entry)
@@ -187,22 +205,39 @@ def game_exists_in_db(p_library_id, p_game_id):
 def game_is_on_PS4(p_platform_list):
     return PSN_JSON_ELEM_GAME_PS4_PFORM in p_platform_list
 
+def game_is_released(p_lib_game_entry):
+    g_is_released = False
+    g_release_date = datetime.strptime(p_lib_game_entry[PSN_JSON_ELEM_RELEASE_DATE], '%Y-%m-%dT%H:%M:%SZ')
+    if(g_release_date < datetime.now()):
+        g_is_released = True
+    return g_is_released
+
+def get_psn_lib_total_results(p_psn_lib_url):
+    response_json = requests.get(p_psn_lib_url+'0')
+    psn_lib_json = response_json.json()
+    return psn_lib_json[PSN_JSON_ELEM_TOTAL_RESULTS]
+
+def get_lib_url_from_db(p_lib_name):
+    return Library.objects.get(library_name=p_lib_name).library_url
+
 def get_psn_lib_json():
     psn_lib_json = None
-
+    psn_lib_url = get_lib_url_from_db(PSN_MODEL_LIBRARY_NAME)
+    response_json = requests.get(psn_lib_url+str(get_psn_lib_total_results(psn_lib_url)))
+    psn_lib_json = response_json.json()
     #File for testing only - live version will pull json from psn api
-    with open('staticfiles/psnvalue/TotalPS4GameLibrary.json') as data_file:    
-        psn_lib_json = json.load(data_file)
+    #with open('staticfiles/psnvalue/TotalPS4GameLibrary.json') as data_file:    
+    #    psn_lib_json = json.load(data_file)
 
     return psn_lib_json
 
 def get_psn_game_json(p_game_url):
     psn_game_json = None
-    #response_json = requests.get(p_game_url)
-    #psn_game_json = response_json.json()
+    response_json = requests.get(p_game_url)
+    psn_game_json = response_json.json()
     #File for testing only - live version will pull json from psn api
-    with open('staticfiles/psnvalue/DragonAgeInquisition_FullGame.json') as data_file:
+    #with open('staticfiles/psnvalue/DragonAgeInquisition_FullGame.json') as data_file:
     #with open('staticfiles/psnvalue/DarkSoulsIII_FullGame.json') as data_file:
-        psn_game_json = json.load(data_file)
+    #    psn_game_json = json.load(data_file)
 
     return psn_game_json
