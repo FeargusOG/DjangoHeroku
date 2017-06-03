@@ -1,7 +1,7 @@
 import json
 import requests
 import collections
-
+import time
 from psycopg2 import IntegrityError
 from django.utils import timezone
 from datetime import datetime
@@ -9,6 +9,12 @@ from .models import Library, GameList, GamePrice, GameRatings, GameValue
 
 #PSN Library Name
 PSN_MODEL_LIBRARY_NAME = 'PS4'
+#PSN Default Rating Value
+PSN_MODEL_RATING_DEFAULT_VALUE = 1
+#PSN Default Rating Count
+PSN_MODEL_RATING_DEFAULT_COUNT = 0
+#PSN Default Free Value - anything less than one causes division by zero errors
+PSN_MODEL_PRICE_FREE = 1
 #PSN Library Total Results
 PSN_JSON_ELEM_TOTAL_RESULTS = 'total_results'
 #PSN Each Game JSON element
@@ -87,9 +93,10 @@ def update_psn_lib(p_library_id):
         else:
             print("Game doesn't exist: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
             add_psn_game(p_library_id, eachGame)
+            time.sleep(1)
 
         count += 1
-        if count == 3:
+        if count == 30:
             break
 
 def add_psn_game(p_library_id, p_base_game_json):
@@ -131,7 +138,9 @@ def get_psn_game_discounts(p_game_price_block_json):
     return psn_discounts(base=base_discount,plus=plus_discount)
 
 def add_psn_game_ratings(p_game_entry, p_game_rating_block_json):
-    add_game_rating_entry(p_game_entry, p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE], p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT])
+    g_rating_value = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] else PSN_MODEL_RATING_DEFAULT_VALUE
+    g_rating_count = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] else PSN_MODEL_RATING_DEFAULT_COUNT
+    add_game_rating_entry(p_game_entry, g_rating_value, g_rating_count)
 
 def add_game_rating_entry(p_game_entry, p_rating_value, p_rating_count):
     return GameRatings.objects.create(game_id=p_game_entry, last_updated=timezone.now(), rating=p_rating_value, rating_count=p_rating_count)
@@ -142,6 +151,7 @@ def add_game_price_entry(p_game_entry, p_price, p_base_discount, p_plus_discount
 def add_psn_game_value(p_game_entry):
     g_rating = get_game_rating(p_game_entry)
     g_price = get_game_price(p_game_entry)
+    g_price = g_price if g_price > 0.0 else PSN_MODEL_PRICE_FREE
     print("Rating: ", g_rating)
     print("Price: ", g_price)
     #Calculate the value for this game

@@ -11,6 +11,8 @@ class Library(models.Model):
     last_updated = models.DateTimeField()
     total_results = models.IntegerField()
     library_url = models.TextField()
+    library_rating_stdev = models.FloatField(default=0.0)
+    library_rating_mean = models.FloatField(default=0.0)
 
     def __str__(self):
         return self.library_name
