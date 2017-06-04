@@ -49,6 +49,7 @@ class GameRatings(models.Model):
     last_updated = models.DateTimeField()
     rating = models.FloatField(default=0.0)
     rating_count = models.IntegerField(default=0)
+    weighted_rating = models.FloatField(default=0.0)
 
     def __str__(self):
         return self.game_id

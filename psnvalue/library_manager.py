@@ -62,6 +62,9 @@ PSN_JSON_ELEM_GAME_RATING_VALUE = 'score'
 #PSN Game Rating Parent Block - part of the full game details json!
 PSN_JSON_ELEM_GAME_RATING_COUNT = 'total'
 
+#TODO tmp values for stdev and mean here
+TMP_STDEV = 0.354
+TMP_MEAN = 4.44
 
 def update_library(p_library_id):
     print("Gonna update the lib: ", p_library_id)
@@ -96,7 +99,7 @@ def update_psn_lib(p_library_id):
             time.sleep(1)
 
         count += 1
-        if count == 30:
+        if count == 100:
             break
 
 def add_psn_game(p_library_id, p_base_game_json):
@@ -140,22 +143,25 @@ def get_psn_game_discounts(p_game_price_block_json):
 def add_psn_game_ratings(p_game_entry, p_game_rating_block_json):
     g_rating_value = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] else PSN_MODEL_RATING_DEFAULT_VALUE
     g_rating_count = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] else PSN_MODEL_RATING_DEFAULT_COUNT
-    add_game_rating_entry(p_game_entry, g_rating_value, g_rating_count)
+    add_game_rating_entry(p_game_entry, g_rating_value, g_rating_count, apply_weighted_game_rating(TMP_STDEV, TMP_MEAN, float(g_rating_value)))
 
-def add_game_rating_entry(p_game_entry, p_rating_value, p_rating_count):
-    return GameRatings.objects.create(game_id=p_game_entry, last_updated=timezone.now(), rating=p_rating_value, rating_count=p_rating_count)
+def apply_weighted_game_rating(p_lib_stdev, p_lib_mean, p_game_rating):
+    return round((p_game_rating*10) + ((p_game_rating - p_lib_mean)/p_lib_stdev),2)
+
+def add_game_rating_entry(p_game_entry, p_rating_value, p_rating_count, p_weighted_rating):
+    return GameRatings.objects.create(game_id=p_game_entry, last_updated=timezone.now(), rating=p_rating_value, rating_count=p_rating_count, weighted_rating=p_weighted_rating)
 
 def add_game_price_entry(p_game_entry, p_price, p_base_discount, p_plus_discount):
     return GamePrice.objects.create(game_id=p_game_entry, last_updated=timezone.now(), base_price=p_price, base_discount=p_base_discount, plus_discount=p_plus_discount)
 
 def add_psn_game_value(p_game_entry):
-    g_rating = get_game_rating(p_game_entry)
+    g_weighted_rating = get_game_weighted_rating(p_game_entry)
     g_price = get_game_price(p_game_entry)
     g_price = g_price if g_price > 0.0 else PSN_MODEL_PRICE_FREE
-    print("Rating: ", g_rating)
+    print("Weighted Rating: ", g_weighted_rating)
     print("Price: ", g_price)
     #Calculate the value for this game
-    g_val = calculate_game_value(g_rating, g_price)
+    g_val = calculate_game_value(g_weighted_rating, g_price)
     print("Value: ", g_val)
     #Add entry to DB for this game value
     add_game_value_entry(p_game_entry, g_val)
@@ -163,8 +169,7 @@ def add_psn_game_value(p_game_entry):
 def calculate_game_value(p_game_rating, p_game_price):
     fixed_price = round(p_game_price)
     fixed_rating = p_game_rating * 100
-    return round(1/(fixed_price/fixed_rating)*1000)
-    #return round((fixed_price/fixed_rating)*100)
+    return round(1/(fixed_price/fixed_rating)*100)  
 
 def get_game_price(p_game_entry):
     g_game_price_obj = GamePrice.objects.get(game_id=p_game_entry)
@@ -182,6 +187,9 @@ def apply_game_discount(p_base_price, p_discount_percentage):
 
 def get_game_rating(p_game_entry):
     return GameRatings.objects.get(game_id=p_game_entry).rating
+
+def get_game_weighted_rating(p_game_entry):
+    return GameRatings.objects.get(game_id=p_game_entry).weighted_rating
 
 def add_game_value_entry(p_game_entry, p_game_value):
     return GameValue.objects.create(game_id=p_game_entry, value_score=p_game_value)
