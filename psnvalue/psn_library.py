@@ -68,10 +68,14 @@ class PSNLibrary(GenericLibrary):
 
         psn_lib_json = self.get_psn_lib_json()
 
+        list_of_game_ratings = super().get_list_of_all_game_ratings()
+        self.m_stdev = super().calculate_standard_deviation(list_of_game_ratings)
+        super().set_standard_deviation(p_library_id, self.m_stdev)
+        self.m_mean = super().calculate_mean(list_of_game_ratings)
+        super().set_mean(p_library_id, self.m_mean)
+
         for eachGame in psn_lib_json[PSN_JSON_ELEM_EACH_GAME]:
-            if(self.game_is_valid(eachGame) == False):
-                continue
-            else:
+            if(self.game_is_valid(eachGame)):
                 if(super().game_exists_in_db(p_library_id, eachGame[PSN_JSON_ELEM_GAME_ID])):
                     print("Game exists: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
                 else:

@@ -2,19 +2,45 @@ import json
 import requests
 import collections
 import time
+from statistics import pstdev, mean
 from django.db import transaction
 from psycopg2 import IntegrityError
 from django.utils import timezone
 from datetime import datetime
 from .models import Library, GameList, GamePrice, GameRatings, GameValue
 
-#TODO tmp values for stdev and mean here
-TMP_STDEV = 0.354
-TMP_MEAN = 4.44
+# These were place-in-time values that were determined.
+DEFAULT_STDEV = 0.71
+DEFAULT_MEAN = 4.11
 
 class GenericLibrary:
-    m_stdev = TMP_STDEV
-    m_mean = TMP_MEAN
+    m_stdev = DEFAULT_STDEV
+    m_mean = DEFAULT_MEAN
+
+    def get_list_of_all_game_ratings(self):
+        return GameRatings.objects.values_list('rating', flat=True)
+
+    def calculate_standard_deviation(self, p_list_of_ratings):
+        return pstdev(p_list_of_ratings)
+
+    def set_standard_deviation(self, p_library_id, p_new_stdev):
+        lib_obj = Library.objects.get(id=p_library_id)
+        lib_obj.library_rating_stdev = p_new_stdev
+        lib_obj.save()
+
+    def get_standard_deviation(self, p_library_id):
+        return Library.objects.get(id=p_library_id).library_rating_stdev
+
+    def calculate_mean(self, p_list_of_ratings):
+        return mean(p_list_of_ratings)
+
+    def set_mean(self, p_library_id, p_new_mean):
+        lib_obj = Library.objects.get(id=p_library_id)
+        lib_obj.library_rating_mean = p_new_mean
+        lib_obj.save()
+
+    def get_mean(self, p_library_id):
+        return Library.objects.get(id=p_library_id).library_rating_mean
 
     def game_exists_in_db(self, p_library_id, p_game_id):
         return (GameList.objects.filter(game_id=p_game_id, library_name=p_library_id).count() != 0)
