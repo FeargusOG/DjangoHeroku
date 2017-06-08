@@ -32,9 +32,9 @@ class GenericLibrary:
         g_game_price = g_game_price_obj.base_price
 
         if(g_game_price_obj.plus_discount > 0):
-            g_game_price = apply_game_discount(g_game_price, g_game_price_obj.plus_discount)
+            g_game_price = self.apply_game_discount(g_game_price, g_game_price_obj.plus_discount)
         elif(g_game_price_obj.base_discount > 0):
-            g_game_price = apply_game_discount(g_game_price, g_game_price_obj.base_discount)
+            g_game_price = self.apply_game_discount(g_game_price, g_game_price_obj.base_discount)
 
         return g_game_price
 

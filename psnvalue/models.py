@@ -9,7 +9,6 @@ def last_day_timedate():
 class Library(models.Model):
     library_name = models.TextField(unique=True)
     last_updated = models.DateTimeField()
-    total_results = models.IntegerField()
     library_url = models.TextField()
     library_rating_stdev = models.FloatField(default=0.0)
     library_rating_mean = models.FloatField(default=0.0)

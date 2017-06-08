@@ -64,34 +64,24 @@ PSN_JSON_ELEM_GAME_RATING_COUNT = 'total'
 
 class PSNLibrary(GenericLibrary):
     def update_psn_lib(self, p_library_id):
-        count_of_base_games = 0
-        psn_lib_json = self.get_psn_lib_json()
         count = 0
+
+        psn_lib_json = self.get_psn_lib_json()
+
         for eachGame in psn_lib_json[PSN_JSON_ELEM_EACH_GAME]:
-            # We're just looking for base games i.e. ignore bundles etc.
-            # If a game is on sale, the bundle is (always?) on sale too.
-            # Maybe we shouldn't be.... Do some tests on this.
-            if PSN_JSON_ELEM_SUB_GAME in eachGame:
-                #print("Game is not full game! - ", eachGame[PSN_JSON_ELEM_GAME_NAME])
+            if(self.game_is_valid(eachGame) == False):
                 continue
-
-            # Check to make sure the game is released - otherwise we can get games without prices etc.
-            if(self.game_is_released(eachGame) == False):
-                #print("Game is not released! - ", eachGame[PSN_JSON_ELEM_GAME_NAME])
-                continue
-
-            # We found a base game, so parse the details
-            count_of_base_games += 1
-            if(super().game_exists_in_db(p_library_id, eachGame[PSN_JSON_ELEM_GAME_ID])):
-                print("Game exists: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
             else:
-                print("Game doesn't exist: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
-                try:
-                    self.add_psn_game(p_library_id, eachGame)
-                except Exception as e:
-                    print("Exception: ", e)
-                
-                time.sleep(1)
+                if(super().game_exists_in_db(p_library_id, eachGame[PSN_JSON_ELEM_GAME_ID])):
+                    print("Game exists: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
+                else:
+                    print("Game doesn't exist: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
+                    #try:
+                    #    self.add_psn_game(p_library_id, eachGame)
+                    #except Exception as e:
+                    #    print("Exception: ", e)
+                    
+                    time.sleep(1)
 
             count += 1
             if count == 2:
@@ -165,6 +155,19 @@ class PSNLibrary(GenericLibrary):
                 break
         return game_thumb
 
+    def game_is_valid(self, p_game_json):
+        game_valid = True
+        # We're just looking for base games i.e. ignore bundles etc.
+        # If a game is on sale, the bundle is (always?) on sale too.
+        # Maybe we shouldn't be.... Do some tests on this.
+        if PSN_JSON_ELEM_SUB_GAME in p_game_json:
+            game_valid = False
+        # Check to make sure the game is released - otherwise we can get games without prices etc.
+        elif(self.game_is_released(p_game_json) == False):
+            game_valid = False
+
+        return game_valid
+
     def game_is_on_PS4(self, p_platform_list):
         return PSN_JSON_ELEM_GAME_PS4_PFORM in p_platform_list
 
@@ -175,29 +178,29 @@ class PSNLibrary(GenericLibrary):
             g_is_released = True
         return g_is_released
 
+    def get_psn_lib_json(self):
+        psn_lib_url = super().get_lib_url_from_db(PSN_MODEL_LIBRARY_NAME)
+        lib_total_results = self.get_psn_lib_total_results(psn_lib_url)
+        return self.make_psn_lib_json_api_request(psn_lib_url, lib_total_results)
+
     def get_psn_lib_total_results(self, p_psn_lib_url):
         response_json = requests.get(p_psn_lib_url+'0')
         psn_lib_json = response_json.json()
         return psn_lib_json[PSN_JSON_ELEM_TOTAL_RESULTS]
 
-    def get_psn_lib_json(self):
-        psn_lib_json = None
-        psn_lib_url = super().get_lib_url_from_db(PSN_MODEL_LIBRARY_NAME)
-        response_json = requests.get(psn_lib_url+str(self.get_psn_lib_total_results(psn_lib_url)))
-        psn_lib_json = response_json.json()
+    def make_psn_lib_json_api_request(self, p_psn_lib_url, p_count_to_fetch):
         #File for testing only - live version will pull json from psn api
         #with open('staticfiles/psnvalue/TotalPS4GameLibrary.json') as data_file:    
         #    psn_lib_json = json.load(data_file)
-
+        response_json = requests.get(p_psn_lib_url+str(p_count_to_fetch))
+        psn_lib_json = response_json.json()
         return psn_lib_json
 
     def get_psn_game_json(self, p_game_url):
-        psn_game_json = None
-        response_json = requests.get(p_game_url)
-        psn_game_json = response_json.json()
         #File for testing only - live version will pull json from psn api
         #with open('staticfiles/psnvalue/DragonAgeInquisition_FullGame.json') as data_file:
         #with open('staticfiles/psnvalue/DarkSoulsIII_FullGame.json') as data_file:
         #    psn_game_json = json.load(data_file)
-
+        response_json = requests.get(p_game_url)
+        psn_game_json = response_json.json()
         return psn_game_json
