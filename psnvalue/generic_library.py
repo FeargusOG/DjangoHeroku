@@ -17,6 +17,9 @@ class GenericLibrary:
     m_stdev = DEFAULT_STDEV
     m_mean = DEFAULT_MEAN
 
+    def get_id_for_game_id(self, p_game_id):
+        return GameList.objects.get(game_id=p_game_id).id
+
     def get_list_of_all_game_ratings(self):
         return GameRatings.objects.values_list('rating', flat=True)
 
@@ -70,13 +73,30 @@ class GenericLibrary:
         return round(1/(fixed_price/fixed_rating)*100) 
 
     def apply_weighted_game_rating(self, p_game_rating):
+        print("USING STDEV: ", self.m_stdev)
         return round((p_game_rating*10) + ((p_game_rating - self.m_mean)/self.m_stdev),2)
 
     def add_game_rating_entry(self, p_game_entry, p_rating_value, p_rating_count, p_weighted_rating):
         return GameRatings.objects.create(game_id=p_game_entry, last_updated=timezone.now(), rating=p_rating_value, rating_count=p_rating_count, weighted_rating=p_weighted_rating)
 
+    def update_game_rating_entry(self, p_game_id, p_rating_value, p_rating_count, p_weighted_rating):
+        game_obj = GameRatings.objects.get(game_id=p_game_id)
+        game_obj.rating = p_rating_value
+        game_obj.rating_count = p_rating_count
+        game_obj.weighted_rating = p_weighted_rating
+        game_obj.last_updated = timezone.now()
+        game_obj.save()
+
     def add_game_price_entry(self, p_game_entry, p_price, p_base_discount, p_plus_discount):
         return GamePrice.objects.create(game_id=p_game_entry, last_updated=timezone.now(), base_price=p_price, base_discount=p_base_discount, plus_discount=p_plus_discount)
+
+    def update_game_price_entry(self, p_game_id, p_price, p_base_discount, p_plus_discount):
+        game_obj = GamePrice.objects.get(game_id=p_game_id)
+        game_obj.base_price = p_price
+        game_obj.base_discount = p_base_discount
+        game_obj.plus_discount = p_plus_discount
+        game_obj.last_updated = timezone.now()
+        game_obj.save()
 
     def apply_game_discount(self, p_base_price, p_discount_percentage):
         return ((p_base_price*(100-p_discount_percentage))/100)
@@ -90,9 +110,17 @@ class GenericLibrary:
     def add_game_value_entry(self, p_game_entry, p_game_value):
         return GameValue.objects.create(game_id=p_game_entry, value_score=p_game_value)
 
+    def update_game_value_entry(self, p_game_id, p_game_value):
+        game_obj = GameValue.objects.get(game_id=p_game_id)
+        game_obj.value_score = p_game_value
+        game_obj.save()
+
     def set_game_age_rating(self, p_game_entry, p_new_age_rating):
         p_game_entry.age_rating = p_new_age_rating
         p_game_entry.save()
+
+    def get_game_details_url_from_db(self, p_game_id):
+        return GameList.objects.get(game_id=p_game_id).json_url
 
     def get_lib_url_from_db(self, p_lib_name):
         return Library.objects.get(library_name=p_lib_name).library_url

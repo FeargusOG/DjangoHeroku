@@ -73,11 +73,13 @@ class PSNLibrary(GenericLibrary):
         super().set_standard_deviation(p_library_id, self.m_stdev)
         self.m_mean = super().calculate_mean(list_of_game_ratings)
         super().set_mean(p_library_id, self.m_mean)
-
+        
         for eachGame in psn_lib_json[PSN_JSON_ELEM_EACH_GAME]:
             if(self.game_is_valid(eachGame)):
                 if(super().game_exists_in_db(p_library_id, eachGame[PSN_JSON_ELEM_GAME_ID])):
                     print("Game exists: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
+                    self.update_psn_game(eachGame)
+                    count += 1
                 else:
                     print("Game doesn't exist: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
                     #try:
@@ -87,13 +89,22 @@ class PSNLibrary(GenericLibrary):
                     
                     time.sleep(1)
 
-            count += 1
-            if count == 2:
-                break
+                #count += 1
+                #if count == 5:
+                #    break
 
     @transaction.atomic #TODO placeholder func
     def update_psn_game(self, p_base_game_json):
+        game_id = super().get_id_for_game_id(p_base_game_json[PSN_JSON_ELEM_GAME_ID])
+        full_details_json = self.get_psn_game_json(super().get_game_details_url_from_db(p_base_game_json[PSN_JSON_ELEM_GAME_ID]))
         print("Updating game: ", p_base_game_json[PSN_JSON_ELEM_GAME_NAME])
+        print("This game has id: ", super().get_id_for_game_id(p_base_game_json[PSN_JSON_ELEM_GAME_ID]))
+        # Update the price
+        self.update_psn_game_price(game_id, full_details_json)
+        # Update the ratings (both new ratings in psn and updated weighting)
+        self.update_psn_game_ratings(game_id, full_details_json[PSN_JSON_ELEM_GAME_RATING_BLOCK])
+        # Update the GameValue entry
+        self.update_psn_game_value(game_id)
 
     @transaction.atomic
     def add_psn_game(self, p_library_id, p_base_game_json):
@@ -113,13 +124,21 @@ class PSNLibrary(GenericLibrary):
         g_age = full_details_json[PSN_JSON_ELEM_GAME_AGERATING]
         super().set_game_age_rating(p_game_entry, g_age)
         #Add a GamePrice entry
-        g_price = full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_BASE_PRICE]
-        g_discount_tuple = self.get_psn_game_discounts(full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
-        super().add_game_price_entry(p_game_entry, g_price, g_discount_tuple.base, g_discount_tuple.plus)
+        self.add_psn_game_price(p_game_entry, full_details_json)
         #Add a GameRatings entry
         self.add_psn_game_ratings(p_game_entry, full_details_json[PSN_JSON_ELEM_GAME_RATING_BLOCK])
         #Add a GameValue entry
         self.add_psn_game_value(p_game_entry)
+
+    def update_psn_game_price(self, p_game_id, p_game_full_details_json):
+        g_price = p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_BASE_PRICE]
+        g_discount_tuple = self.get_psn_game_discounts(p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
+        super().update_game_price_entry(p_game_id, g_price, g_discount_tuple.base, g_discount_tuple.plus)
+
+    def add_psn_game_price(self, p_game_entry, p_game_full_details_json):
+        g_price = p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_BASE_PRICE]
+        g_discount_tuple = self.get_psn_game_discounts(p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
+        super().add_game_price_entry(p_game_entry, g_price, g_discount_tuple.base, g_discount_tuple.plus)
 
     def get_psn_game_discounts(self, p_game_price_block_json):
         psn_discounts = collections.namedtuple('psn_discounts', ['base', 'plus'])
@@ -139,6 +158,11 @@ class PSNLibrary(GenericLibrary):
         g_rating_count = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] else PSN_MODEL_RATING_DEFAULT_COUNT
         super().add_game_rating_entry(p_game_entry, g_rating_value, g_rating_count, super().apply_weighted_game_rating(float(g_rating_value)))
 
+    def update_psn_game_ratings(self, p_game_id, p_game_rating_block_json):
+        g_rating_value = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] else PSN_MODEL_RATING_DEFAULT_VALUE
+        g_rating_count = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] else PSN_MODEL_RATING_DEFAULT_COUNT
+        super().update_game_rating_entry(p_game_id, g_rating_value, g_rating_count, super().apply_weighted_game_rating(float(g_rating_value)))
+
     def add_psn_game_value(self, p_game_entry):
         g_weighted_rating = super().get_game_weighted_rating(p_game_entry)
         g_price = super().get_game_price(p_game_entry)
@@ -150,6 +174,18 @@ class PSNLibrary(GenericLibrary):
         print("Value: ", g_val)
         #Add entry to DB for this game value
         super().add_game_value_entry(p_game_entry, g_val)
+
+    def update_psn_game_value(self, p_game_id):
+        g_weighted_rating = super().get_game_weighted_rating(p_game_id)
+        g_price = super().get_game_price(p_game_id)
+        g_price = g_price if g_price > 0.0 else PSN_MODEL_PRICE_FREE
+        print("Updated Weighted Rating: ", g_weighted_rating)
+        print("Updated Price: ", g_price)
+        #Calculate the value for this game
+        g_val = super().calculate_game_value(g_weighted_rating, g_price)
+        print("Updated Value: ", g_val)
+        #Add entry to DB for this game value
+        super().update_game_value_entry(p_game_id, g_val)
 
     def get_psn_thumbnail(self, p_image_list):
         game_thumb = None
