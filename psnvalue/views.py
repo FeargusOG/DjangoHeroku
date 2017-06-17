@@ -11,7 +11,7 @@ class IndexView(generic.ListView):
     context_object_name = 'library_list'
 
     def get_queryset(self):
-        return Library.objects.exclude(library_name='TEST')#.all()
+        return Library.objects.all()
 
 def listlibs(request):
     return HttpResponse("Hello, world. You're at the psnvalue list.")

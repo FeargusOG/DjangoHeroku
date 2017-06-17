@@ -28,8 +28,10 @@ SECRET_KEY = "15ut=tqw3nm+dxn=f9r0npr)_xj5nu70y0(ucg)ur%=uizn^x&"
 DEBUG = True
 
 # CELERY STUFF
-BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+REDIS_URL_VAL = os.environ['REDIS_URL']
+print("Here is the REDIS_URL: ", REDIS_URL_VAL)
+BROKER_URL = REDIS_URL_VAL
+CELERY_RESULT_BACKEND = REDIS_URL_VAL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

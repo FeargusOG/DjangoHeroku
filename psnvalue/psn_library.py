@@ -82,10 +82,10 @@ class PSNLibrary(GenericLibrary):
                     count += 1
                 else:
                     print("Game doesn't exist: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
-                    #try:
-                    #    self.add_psn_game(p_library_id, eachGame)
-                    #except Exception as e:
-                    #    print("Exception: ", e)
+                    try:
+                        self.add_psn_game(p_library_id, eachGame)
+                    except Exception as e:
+                        print("Exception: ", e)
                     
                     time.sleep(1)
 
