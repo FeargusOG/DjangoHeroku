@@ -24,7 +24,10 @@ class GenericLibrary:
         return GameRatings.objects.values_list('rating', flat=True)
 
     def calculate_standard_deviation(self, p_list_of_ratings):
-        return pstdev(p_list_of_ratings)
+        if p_list_of_ratings: 
+            return pstdev(p_list_of_ratings)
+        else:
+            return DEFAULT_STDEV
 
     def set_standard_deviation(self, p_library_id, p_new_stdev):
         lib_obj = Library.objects.get(id=p_library_id)
@@ -35,7 +38,10 @@ class GenericLibrary:
         return Library.objects.get(id=p_library_id).library_rating_stdev
 
     def calculate_mean(self, p_list_of_ratings):
-        return mean(p_list_of_ratings)
+        if p_list_of_ratings:
+            return mean(p_list_of_ratings)
+        else:
+            return DEFAULT_MEAN
 
     def set_mean(self, p_library_id, p_new_mean):
         lib_obj = Library.objects.get(id=p_library_id)
