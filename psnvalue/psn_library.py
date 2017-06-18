@@ -66,8 +66,10 @@ class PSNLibrary(GenericLibrary):
     def update_psn_lib(self, p_library_id):
         count = 0
 
+        # Get the Library JSON
         psn_lib_json = self.get_psn_lib_json()
 
+        # Set Library statistics for rating weighting
         list_of_game_ratings = super().get_list_of_all_game_ratings()
         self.m_stdev = super().calculate_standard_deviation(list_of_game_ratings)
         super().set_standard_deviation(p_library_id, self.m_stdev)
@@ -92,6 +94,9 @@ class PSNLibrary(GenericLibrary):
                 #count += 1
                 #if count == 5:
                 #    break
+
+        # Update the Library 'Last Updated' field
+        super().set_library_last_updated(p_library_id, timezone.now())
 
     @transaction.atomic #TODO placeholder func
     def update_psn_game(self, p_base_game_json):

@@ -17,6 +17,14 @@ class GenericLibrary:
     m_stdev = DEFAULT_STDEV
     m_mean = DEFAULT_MEAN
 
+    def get_library_last_updated(self, p_library_id):
+        return Library.objects.get(id=p_library_id).last_updated
+
+    def set_library_last_updated(self, p_library_id, p_new_timedate):
+        lib_obj = Library.objects.get(id=p_library_id)
+        lib_obj.last_updated = p_new_timedate
+        lib_obj.save()
+
     def get_id_for_game_id(self, p_game_id):
         return GameList.objects.get(game_id=p_game_id).id
 
