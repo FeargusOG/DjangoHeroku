@@ -21,11 +21,10 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "15ut=tqw3nm+dxn=f9r0npr)_xj5nu70y0(ucg)ur%=uizn^x&"
+SECRET_KEY = os.environ['SECRET_KEY_VAL']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # CELERY STUFF
 REDIS_URL_VAL = os.environ['REDIS_URL']
