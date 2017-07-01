@@ -5,6 +5,7 @@
 {% if game_list %}
     <table>
         <tr>
+            <th>Game Cover</th>
             <th>Game Name</th>
             <th>Game Rating</th>
             <th>Game Price</th>
@@ -12,6 +13,7 @@
         </tr>
         {% for game in game_list %}
         <tr>
+            <td><img src="{{ game.image_url }}" alt="Smiley face" height="100" width="100"></td>
             <td>{{ game.game_name }}</td>
             <td>{{ game.weighted_rating }}</td>
             <td>{{ game.net_price }}</td>
