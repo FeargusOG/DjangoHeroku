@@ -25,6 +25,6 @@ def listlibs(request):
 
 def updatelib(request, library_id):
     if not request.user.is_staff:
-        raise Http404("Not found.")
+        raise Http404("You do not have access to this resource.")
     library_manager.update_library(library_id)
     return HttpResponse("Hello, world. You're at the psnvalue updatelib.")
