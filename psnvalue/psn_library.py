@@ -82,13 +82,13 @@ class PSNLibrary(GenericLibrary):
 
                     time.sleep(1)
 
-                    count += 1
-                    if count == 5:
-                        break
+                    #count += 1
+                    #if count == 5:
+                    #    break
             except Exception as e:
                 print("Exception processing game: ", e)
                 traceback.print_exc()
-                break
+                #break
 
         # Update Library statistics for rating weighting
         super().update_library_statistics(library_obj)
@@ -141,7 +141,7 @@ class PSNLibrary(GenericLibrary):
         base_discount = 0
         plus_discount = 0
         if (PSN_JSON_ELEM_GAME_REWARDS in p_game_price_block_json) and (p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]):
-            print(type(p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]))
+            #print(type(p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]))
             if PSN_JSON_ELEM_GAME_BASE_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
                 base_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
             if PSN_JSON_ELEM_GAME_BONUS_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:

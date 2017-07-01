@@ -1,0 +1,24 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'psnvalue/style.css' %}" />
+
+{% if game_list %}
+    <table>
+        <tr>
+            <th>Game Name</th>
+            <th>Game Rating</th>
+            <th>Game Price</th>
+            <th>Game Value</th>
+        </tr>
+        {% for game in game_list %}
+        <tr>
+            <td>{{ game.game_name }}</td>
+            <td>{{ game.weighted_rating }}</td>
+            <td>{{ game.net_price }}</td>
+            <td>{{ game.value_score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No games are available.</p>
+{% endif %}

@@ -57,17 +57,21 @@ class GenericLibrary:
         return GameList.objects.create(game_id=p_g_id, game_name=p_g_name, json_url=p_g_url, image_url=p_g_thumb, age_rating=p_g_age, library_fk=p_library_obj)
 
     def get_net_game_price(self, p_game_obj):
-        g_game_price = p_game_obj.base_price
+        game_price = p_game_obj.base_price
+        game_discount = max(p_game_obj.base_discount, p_game_obj.plus_discount)
 
-        if(p_game_obj.plus_discount > 0):
-            g_game_price = self.apply_game_discount(g_game_price, p_game_obj.plus_discount)
-        elif(p_game_obj.base_discount > 0):
-            g_game_price = self.apply_game_discount(g_game_price, p_game_obj.base_discount)
+        if(game_discount > 0):
+            game_price = self.apply_game_discount(game_price, game_discount)
 
-        return g_game_price if g_game_price > 0.0 else DEFAULT_GAME_PRICE
+        return game_price
+
+    def apply_game_discount(self, p_base_price, p_discount_percentage):
+        return ((p_base_price*(100-p_discount_percentage))/100)
 
     def calculate_game_value(self, p_game_rating, p_game_price):
-        fixed_price = round(p_game_price)
+        # Account for free games
+        game_price = p_game_price if p_game_price > 0.0 else DEFAULT_GAME_PRICE
+        fixed_price = round(game_price)
         fixed_rating = p_game_rating * 100
         return round(1/(fixed_price/fixed_rating)*100) 
 
@@ -77,18 +81,3 @@ class GenericLibrary:
     def update_game_obj(self, p_game_obj):
         p_game_obj.last_updated = timezone.now()
         p_game_obj.save()
-
-    def apply_game_discount(self, p_base_price, p_discount_percentage):
-        return ((p_base_price*(100-p_discount_percentage))/100)
-
-    def get_game_rating(self, p_game_entry):
-        return GameRatings.objects.get(game_id=p_game_entry).rating
-
-    def get_game_weighted_rating(self, p_game_entry):
-        return GameRatings.objects.get(game_id=p_game_entry).weighted_rating
-
-    def get_game_details_url_from_db(self, p_game_id):
-        return GameList.objects.get(game_id=p_game_id).json_url
-
-    def get_lib_url_from_db(self, p_lib_name):
-        return Library.objects.get(library_name=p_lib_name).library_url

@@ -4,7 +4,7 @@ from django.views import generic
 from django.http import HttpResponse
 from django.http import Http404
 
-from .models import Library
+from .models import Library, GameList
 
 class IndexView(generic.ListView):
     template_name = 'psnvalue/index.html'
@@ -12,6 +12,13 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         return Library.objects.all()
+
+class GameListView(generic.ListView):
+    template_name = 'psnvalue/gamelist.html'
+    context_object_name = 'game_list'
+
+    def get_queryset(self):
+        return GameList.objects.all().order_by('-value_score')
 
 def listlibs(request):
     return HttpResponse("Hello, world. You're at the psnvalue list.")
