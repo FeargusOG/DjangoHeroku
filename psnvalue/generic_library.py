@@ -77,12 +77,7 @@ class GenericLibrary:
         game_price = p_game_price if p_game_price > 0.0 else DEFAULT_GAME_PRICE
         fixed_price = round(game_price)
         fixed_rating = p_game_rating * 100
-        print("Fixed Price - ", fixed_price)
-        print("Fixed Rating - ", fixed_rating)
         return round(1/(fixed_price/fixed_rating)*100) 
-
-    #def apply_weighted_game_rating(self, p_library_obj, p_game_rating):
-    #    return round((p_game_rating*10) + ((p_game_rating - p_library_obj.library_rating_mean)/p_library_obj.library_rating_stdev),2)
 
     def apply_weighted_game_rating(self, p_library_obj, p_game_obj):
         # Determine if this game is above or below the mean rating. 
@@ -90,7 +85,7 @@ class GenericLibrary:
         aboveMean = (((float(p_game_obj.rating) - DEFAULT_MEAN)/DEFAULT_STDEV) > 0)
 
         # Determine the weight to apply to rating count.
-        countVal = (p_game_obj.rating_count/125)
+        countVal = (float(p_game_obj.rating_count)/125)
 
         # Determine the weight to apply to the discount.
         discVal = 1+(max(p_game_obj.base_discount, p_game_obj.plus_discount)/100)

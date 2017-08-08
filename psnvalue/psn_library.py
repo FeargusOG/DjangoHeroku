@@ -120,12 +120,12 @@ class PSNLibrary(GenericLibrary):
         g_url = p_base_game_json[PSN_JSON_ELEM_GAME_URL]
         g_thumb = self.get_psn_thumbnail(p_base_game_json[PSN_JSON_ELEM_GAME_IMAGES])
         g_age = PSN_DEFAULT_AGE_RATING #TODO, set this correctly...
-        print("Adding game: ", g_name, " - ", g_url)
+        # print("Adding game: ", g_name, " - ", g_url)
         return super().add_skeleton_game_list_entry_to_db(g_id, g_name, g_url, g_thumb, g_age, p_library_obj)
 
     @transaction.atomic
     def update_psn_game(self, p_library_obj, p_game_obj):
-        print("Updating game: ", p_game_obj.game_name)
+        # print("Updating game: ", p_game_obj.game_name)
         full_details_json = self.request_psn_game_json(p_game_obj)
 
         # Set the price
