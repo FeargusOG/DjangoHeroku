@@ -21,10 +21,16 @@ class GameListView(generic.ListView):
         return GameList.objects.filter(rating_count__gte=50, base_price__gte=1).order_by('-value_score')
 
 def listlibs(request):
-    return HttpResponse("Hello, world. You're at the psnvalue list.")
+    return HttpResponse("You're at the psnvalue list.")
 
 def updatelib(request, library_id):
     if not request.user.is_staff:
         raise Http404("You do not have access to this resource.")
     library_manager.update_library(library_id)
-    return HttpResponse("Hello, world. You're at the psnvalue updatelib.")
+    return HttpResponse("You're at the psnvalue updatelib.")
+
+def updateweightedrating(request, library_id):
+    if not request.user.is_staff:
+        raise Http404("You do not have access to this resource.")
+    library_manager.update_weighted_rating(library_id)
+    return HttpResponse("You're at the psnvalue update weighted rating.")

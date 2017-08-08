@@ -60,6 +60,22 @@ PSN_JSON_ELEM_GAME_RATING_VALUE = 'score'
 PSN_JSON_ELEM_GAME_RATING_COUNT = 'total'
 
 class PSNLibrary(GenericLibrary):
+
+    def update_psn_weighted_ratings(self, p_library_id):
+        # Get the Library Object from the DB
+        library_obj = super().get_library_obj(p_library_id)
+
+        # Get all games from the DB
+        all_games_objs = super().get_all_game_objs(library_obj)
+
+        for each_game_obj in all_games_objs:
+            print("Game: ", each_game_obj.game_name)
+            each_game_obj.weighted_rating = super().apply_weighted_game_rating(library_obj, each_game_obj)
+            super().update_game_obj(each_game_obj)
+            self.set_psn_game_value(each_game_obj)
+            super().update_game_obj(each_game_obj)
+
+
     def update_psn_lib(self, p_library_id):
         count = 0
 
@@ -131,7 +147,7 @@ class PSNLibrary(GenericLibrary):
     def set_psn_game_ratings(self, p_library_obj, p_game_obj, p_game_rating_block_json):
         p_game_obj.rating = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] else PSN_MODEL_RATING_DEFAULT_VALUE
         p_game_obj.rating_count = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] else PSN_MODEL_RATING_DEFAULT_COUNT
-        p_game_obj.weighted_rating = super().apply_weighted_game_rating(p_library_obj, float(p_game_obj.rating))
+        p_game_obj.weighted_rating = super().apply_weighted_game_rating(p_library_obj, p_game_obj)
 
     def set_psn_game_value(self, p_game_obj):
         p_game_obj.value_score = super().calculate_game_value(p_game_obj.weighted_rating, p_game_obj.net_price)

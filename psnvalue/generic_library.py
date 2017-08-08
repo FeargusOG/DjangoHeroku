@@ -14,8 +14,12 @@ DEFAULT_STDEV = 0.71
 DEFAULT_MEAN = 4.11
 # DEFAULT_GAME_PRICE - anything less than one causes division by zero errors
 DEFAULT_GAME_PRICE = 1
+DEFAULT_GAME_WEIGHTED_RATING = 1
 
 class GenericLibrary:
+
+    def get_all_game_objs(self, p_library_obj):
+        return GameList.objects.all()
 
     def get_library_obj(self, p_library_id):
         return Library.objects.get(pk=p_library_id)
@@ -73,10 +77,37 @@ class GenericLibrary:
         game_price = p_game_price if p_game_price > 0.0 else DEFAULT_GAME_PRICE
         fixed_price = round(game_price)
         fixed_rating = p_game_rating * 100
+        print("Fixed Price - ", fixed_price)
+        print("Fixed Rating - ", fixed_rating)
         return round(1/(fixed_price/fixed_rating)*100) 
 
-    def apply_weighted_game_rating(self, p_library_obj, p_game_rating):
-        return round((p_game_rating*10) + ((p_game_rating - p_library_obj.library_rating_mean)/p_library_obj.library_rating_stdev),2)
+    #def apply_weighted_game_rating(self, p_library_obj, p_game_rating):
+    #    return round((p_game_rating*10) + ((p_game_rating - p_library_obj.library_rating_mean)/p_library_obj.library_rating_stdev),2)
+
+    def apply_weighted_game_rating(self, p_library_obj, p_game_obj):
+        # Determine if this game is above or below the mean rating. 
+        # Necessary for applying different weighting algorithm.
+        aboveMean = (((float(p_game_obj.rating) - DEFAULT_MEAN)/DEFAULT_STDEV) > 0)
+
+        # Determine the weight to apply to rating count.
+        countVal = (p_game_obj.rating_count/125)
+
+        # Determine the weight to apply to the discount.
+        discVal = 1+(max(p_game_obj.base_discount, p_game_obj.plus_discount)/100)
+        
+        # Determine weighting to apply based on rating deviation from the mean.
+        ratingConstant = 1 if aboveMean else -1
+        ratingVal = round((float(p_game_obj.rating)) * (ratingConstant+((float(p_game_obj.rating) - DEFAULT_MEAN)/DEFAULT_STDEV)),2)
+
+        # Apply different weights depending if the game rating is above or below mean.
+        finalVal = 0
+        if(aboveMean):
+            finalVal = (ratingVal+countVal)*discVal
+        else:
+            finalVal = (ratingVal-countVal)/discVal
+
+        # Account for a weighted rating of zero
+        return DEFAULT_GAME_WEIGHTED_RATING if finalVal == 0.0 else finalVal
 
     def update_game_obj(self, p_game_obj):
         p_game_obj.last_updated = timezone.now()
