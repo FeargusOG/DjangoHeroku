@@ -73,6 +73,13 @@ PSN_JSON_ELEM_GAME_RATING_COUNT = 'total'
 # Element - The age limit of this game
 PSN_JSON_ELEM_GAME_AGERATING = 'age_limit'
 
+# Parent Element - Block that contains list of content descriptors
+PSN_JSON_ELEM_EACH_GAME_CONTENT = 'content_descriptors'
+# Element - Name of content e.g. Language
+PSN_JSON_ELEM_GAME_CONTENT_NAME = 'name'
+# Element - Description of content e.g. Language
+PSN_JSON_ELEM_GAME_CONTENT_DESCR = 'description'
+
 
 class PSNLibrary(GenericLibrary):
 
@@ -90,9 +97,8 @@ class PSNLibrary(GenericLibrary):
             self.set_psn_game_value(each_game_obj)
             super().update_game_obj(each_game_obj)
 
-
     def update_psn_lib(self, p_library_id):
-
+        count = 0
         # Get the Library Object from the DB
         library_obj = super().get_library_obj(p_library_id)
 
@@ -102,7 +108,12 @@ class PSNLibrary(GenericLibrary):
         for eachGame in psn_lib_json[PSN_JSON_ELEM_EACH_GAME]:
             try:
                 if(self.game_is_valid(eachGame)):
+                    print(eachGame[PSN_JSON_ELEM_GAME_NAME])
                     game_obj = super().get_game_obj(library_obj, eachGame[PSN_JSON_ELEM_GAME_ID])
+
+                    #count = count + 1
+                    #if(count == 6):
+                    #    break
 
                     # If this game doesn't exist in the DB yet, add a skeleton record and update below.
                     if(game_obj == None):
@@ -139,6 +150,8 @@ class PSNLibrary(GenericLibrary):
     @transaction.atomic
     def update_psn_game(self, p_library_obj, p_game_obj):
         full_details_json = self.request_psn_game_json(p_game_obj)
+        # Set the game content
+        self.set_psn_game_content(p_game_obj, full_details_json)
         # Set the price
         self.set_psn_game_price(p_game_obj, full_details_json)
         # Set the ratings (both new ratings in psn and updated weighting)
@@ -148,8 +161,19 @@ class PSNLibrary(GenericLibrary):
         # Update the game object in the DB
         super().update_game_obj(p_game_obj)
 
+    def set_psn_game_content(self, p_game_obj, p_game_full_details_json):
+        # Check if there is a content descriptors json block
+        if (PSN_JSON_ELEM_EACH_GAME_CONTENT in p_game_full_details_json) and (p_game_full_details_json[PSN_JSON_ELEM_EACH_GAME_CONTENT]):
+            for eachContentDescr in p_game_full_details_json[PSN_JSON_ELEM_EACH_GAME_CONTENT]:
+                #print(eachContentDescr[PSN_JSON_ELEM_GAME_CONTENT_NAME])
+                content_descriptor = super().get_or_create_content_descriptor(eachContentDescr[PSN_JSON_ELEM_GAME_CONTENT_NAME], eachContentDescr[PSN_JSON_ELEM_GAME_CONTENT_DESCR])
+                super().get_or_create_game_content(p_game_obj, content_descriptor)
+                
+
     def set_psn_game_price(self, p_game_obj, p_game_full_details_json):
+        # Set the standard price of the game
         p_game_obj.price = p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_PRICE]
+        # Now set any discount rates and prices
         g_discount_dtls_tuple = self.get_psn_game_discounts(p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
         p_game_obj.base_discount = g_discount_dtls_tuple.rates.base
         p_game_obj.plus_discount = g_discount_dtls_tuple.rates.plus
@@ -162,8 +186,8 @@ class PSNLibrary(GenericLibrary):
         p_game_obj.weighted_rating = super().apply_weighted_game_rating(p_library_obj, p_game_obj)
 
     def set_psn_game_value(self, p_game_obj):
-        p_game_obj.base_value_score = super().calculate_game_value(p_game_obj.weighted_rating, super().get_net_game_price(p_game_obj, False))
-        p_game_obj.plus_value_score = super().calculate_game_value(p_game_obj.weighted_rating, super().get_net_game_price(p_game_obj, True))
+        p_game_obj.base_value_score = super().calculate_game_value(p_game_obj, False)
+        p_game_obj.plus_value_score = super().calculate_game_value(p_game_obj, True)
 
     def get_psn_game_discounts(self, p_game_price_block_json):
         psn_discount_dtls = collections.namedtuple('psn_discount_dtls', ['rates', 'prices'])
@@ -171,12 +195,20 @@ class PSNLibrary(GenericLibrary):
         psn_discount_prices = collections.namedtuple('psn_discount_prices', ['base', 'plus'])
         base_discount = 0
         plus_discount = 0
-        base_price = 0.0
-        plus_price = 0.0
+
+        # Use the standard price as default, and only overwrite if there are discounts.
+        base_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_PRICE]
+        plus_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_PRICE]
+
+        # Check if there is a discount json block
         if (PSN_JSON_ELEM_GAME_REWARDS in p_game_price_block_json) and (p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]):
+            # Check for discounts that apply to PS and non-PS Plus members
             if PSN_JSON_ELEM_GAME_BASE_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
                 base_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
                 base_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_PRICE]
+                plus_discount = base_discount
+                plus_price = base_price
+            # Now check for discounts that apply only to PS Plus members
             if PSN_JSON_ELEM_GAME_BONUS_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
                 plus_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_DISCOUNT]
                 plus_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_PRICE]

@@ -48,15 +48,15 @@ class GameList(models.Model):
         return self.last_updated >= last_day_timedate()
 
 class ContentDescriptors(models.Model):
-    content_name = models.TextField()
+    content_name = models.TextField(unique=True)
     content_description = models.TextField()
 
     def __str__(self):
         return self.content_name
 
 class GameContent(models.Model):
-    game_id = models.ForeignKey(GameList, on_delete=models.CASCADE)
-    content_name = models.ForeignKey(ContentDescriptors, on_delete=models.CASCADE)
+    game_id_fk = models.ForeignKey(GameList, on_delete=models.CASCADE)
+    content_descriptor_fk = models.ForeignKey(ContentDescriptors, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.game_id + " - " + self.content_name
+    class Meta:
+        unique_together = ('game_id_fk', 'content_descriptor_fk',)
