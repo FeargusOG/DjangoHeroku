@@ -60,17 +60,14 @@ class GenericLibrary:
     def add_skeleton_game_list_entry_to_db(self, p_g_id, p_g_name, p_g_url, p_g_thumb, p_g_age, p_library_obj):
         return GameList.objects.create(game_id=p_g_id, game_name=p_g_name, json_url=p_g_url, image_url=p_g_thumb, age_rating=p_g_age, library_fk=p_library_obj)
 
-    def get_net_game_price(self, p_game_obj):
-        game_price = p_game_obj.base_price
-        game_discount = max(p_game_obj.base_discount, p_game_obj.plus_discount)
-
-        if(game_discount > 0):
-            game_price = self.apply_game_discount(game_price, game_discount)
+    def get_net_game_price(self, p_game_obj, p_plus):
+        game_price = p_game_obj.price
+        if(p_game_obj.base_price > 0.0):
+            game_price = p_game_obj.base_price
+        if(p_plus == True and p_game_obj.plus_price > 0.0):
+            game_price = p_game_obj.plus_price
 
         return game_price
-
-    def apply_game_discount(self, p_base_price, p_discount_percentage):
-        return ((p_base_price*(100-p_discount_percentage))/100)
 
     def calculate_game_value(self, p_game_rating, p_game_price):
         # Account for free games

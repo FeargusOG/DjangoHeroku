@@ -14,6 +14,12 @@ PSN_MODEL_LIBRARY_NAME = 'PS4'
 PSN_MODEL_RATING_DEFAULT_VALUE = 1
 #PSN Default Rating Count
 PSN_MODEL_RATING_DEFAULT_COUNT = 0
+#PSN Default Age Rating
+PSN_DEFAULT_AGE_RATING = 0
+
+###############################################################
+#   These elements below are part of the PSN library's JSON   #
+###############################################################
 #PSN Library Total Results
 PSN_JSON_ELEM_TOTAL_RESULTS = 'total_results'
 #PSN Each Game JSON element
@@ -38,29 +44,39 @@ PSN_JSON_ELEM_GAME_IMAGES = 'images'
 PSN_JSON_ELEM_GAME_IMGTYPE = 'type'
 #PSN Game Image thumb type
 PSN_JSON_ELEM_GAME_IMGTYPE_THUMB = 1
-#PSN Game Age Rating JSON element - part of the full game details json!
-PSN_JSON_ELEM_GAME_AGERATING = 'age_limit'
-#PSN Default Age Rating
-PSN_DEFAULT_AGE_RATING = 0
-#PSN Main Game details block
+#PSN Main Game details block - This element is part of both the library and game JSON!
 PSN_JSON_ELEM_GAME_PRICE_BLOCK = 'default_sku'
-#PSN Base Price JSON element - part of the full game details json!
-PSN_JSON_ELEM_GAME_BASE_PRICE = 'price'
-#PSN Base Discount JSON element - part of the full game details json!
+
+####################################################################
+#   These elements below are part of each individual game's JSON   #
+####################################################################
+# Element - The price of the game before discounts are applied
+PSN_JSON_ELEM_GAME_PRICE = 'price'
+# Parent Element - Block that contains the details of any discounts
 PSN_JSON_ELEM_GAME_REWARDS = 'rewards'
-#PSN Base Discount JSON element - part of the full game details json!
+# Element - The discount on the game for non-PSPlus members
 PSN_JSON_ELEM_GAME_BASE_DISCOUNT = 'discount'
-#PSN PS Plus Discount JSON element - part of the full game details json!
+# Element - The price of the game after applying discount for non-PSPlus members
+PSN_JSON_ELEM_GAME_BASE_PRICE = 'price'
+# Element - The discount on the game for PSPlus members
 PSN_JSON_ELEM_GAME_BONUS_DISCOUNT = 'bonus_discount'
-#PSN Game Rating Parent Block - part of the full game details json!
+# Element - The price of the game after applying discount for PSPlus members
+PSN_JSON_ELEM_GAME_BONUS_PRICE = 'bonus_price'
+
+# Parent Element - Block that contains all rating info
 PSN_JSON_ELEM_GAME_RATING_BLOCK = 'star_rating'
-#PSN Game Rating Parent Block - part of the full game details json!
+# Element - The rating for this game
 PSN_JSON_ELEM_GAME_RATING_VALUE = 'score'
-#PSN Game Rating Parent Block - part of the full game details json!
+# Element - The number of rating votes this game has recieved
 PSN_JSON_ELEM_GAME_RATING_COUNT = 'total'
+
+# Element - The age limit of this game
+PSN_JSON_ELEM_GAME_AGERATING = 'age_limit'
+
 
 class PSNLibrary(GenericLibrary):
 
+    # This is used for applying updates to the rating weighting algorithm
     def update_psn_weighted_ratings(self, p_library_id):
         # Get the Library Object from the DB
         library_obj = super().get_library_obj(p_library_id)
@@ -133,11 +149,12 @@ class PSNLibrary(GenericLibrary):
         super().update_game_obj(p_game_obj)
 
     def set_psn_game_price(self, p_game_obj, p_game_full_details_json):
-        p_game_obj.base_price = p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_BASE_PRICE]
-        g_discount_tuple = self.get_psn_game_discounts(p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
-        p_game_obj.base_discount = g_discount_tuple.base
-        p_game_obj.plus_discount = g_discount_tuple.plus
-        p_game_obj.net_price = super().get_net_game_price(p_game_obj)
+        p_game_obj.price = p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_PRICE]
+        g_discount_dtls_tuple = self.get_psn_game_discounts(p_game_full_details_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
+        p_game_obj.base_discount = g_discount_dtls_tuple.rates.base
+        p_game_obj.plus_discount = g_discount_dtls_tuple.rates.plus
+        p_game_obj.base_price = g_discount_dtls_tuple.prices.base
+        p_game_obj.plus_price = g_discount_dtls_tuple.prices.plus
 
     def set_psn_game_ratings(self, p_library_obj, p_game_obj, p_game_rating_block_json):
         p_game_obj.rating = p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] if p_game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] else PSN_MODEL_RATING_DEFAULT_VALUE
@@ -145,19 +162,29 @@ class PSNLibrary(GenericLibrary):
         p_game_obj.weighted_rating = super().apply_weighted_game_rating(p_library_obj, p_game_obj)
 
     def set_psn_game_value(self, p_game_obj):
-        p_game_obj.value_score = super().calculate_game_value(p_game_obj.weighted_rating, p_game_obj.net_price)
+        p_game_obj.base_value_score = super().calculate_game_value(p_game_obj.weighted_rating, super().get_net_game_price(p_game_obj, False))
+        p_game_obj.plus_value_score = super().calculate_game_value(p_game_obj.weighted_rating, super().get_net_game_price(p_game_obj, True))
 
     def get_psn_game_discounts(self, p_game_price_block_json):
-        psn_discounts = collections.namedtuple('psn_discounts', ['base', 'plus'])
+        psn_discount_dtls = collections.namedtuple('psn_discount_dtls', ['rates', 'prices'])
+        psn_discount_rates = collections.namedtuple('psn_discount_rates', ['base', 'plus'])
+        psn_discount_prices = collections.namedtuple('psn_discount_prices', ['base', 'plus'])
         base_discount = 0
         plus_discount = 0
+        base_price = 0.0
+        plus_price = 0.0
         if (PSN_JSON_ELEM_GAME_REWARDS in p_game_price_block_json) and (p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]):
             if PSN_JSON_ELEM_GAME_BASE_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
                 base_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
+                base_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_PRICE]
             if PSN_JSON_ELEM_GAME_BONUS_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
                 plus_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_DISCOUNT]
+                plus_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_PRICE]
 
-        return psn_discounts(base=base_discount,plus=plus_discount)
+        discount_rates_tuple = psn_discount_rates(base=base_discount,plus=plus_discount)
+        discount_prices_tuple = psn_discount_prices(base=base_price,plus=plus_price)
+        discount_dtls_tuple = psn_discount_dtls(rates=discount_rates_tuple,prices=discount_prices_tuple)
+        return discount_dtls_tuple
 
     def get_psn_thumbnail(self, p_image_list):
         game_thumb = None

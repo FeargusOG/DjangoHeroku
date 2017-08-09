@@ -18,7 +18,7 @@ class GameListView(generic.ListView):
     context_object_name = 'game_list'
 
     def get_queryset(self):
-        return GameList.objects.filter(rating_count__gte=50, base_price__gte=1).order_by('-value_score')
+        return GameList.objects.filter(rating_count__gte=50, base_price__gte=1).order_by('-plus_value_score')
 
 def listlibs(request):
     return HttpResponse("You're at the psnvalue list.")

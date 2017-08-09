@@ -28,8 +28,9 @@ class GameList(models.Model):
     library_fk = models.ForeignKey(Library, on_delete=models.CASCADE)
     last_updated = models.DateTimeField(default=timezone.now)
     #Price fields
+    price = models.FloatField(default=0.0)
     base_price = models.FloatField(default=0.0)
-    net_price = models.FloatField(default=0.0)
+    plus_price = models.FloatField(default=0.0)
     base_discount = models.IntegerField(default=0)
     plus_discount = models.IntegerField(default=0)
     #Rating fields
@@ -37,7 +38,8 @@ class GameList(models.Model):
     rating_count = models.IntegerField(default=0)
     weighted_rating = models.FloatField(default=0.0)
     #Value fields
-    value_score = models.IntegerField(default=0)
+    base_value_score = models.IntegerField(default=0)
+    plus_value_score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.game_id + ": " + self.game_name
