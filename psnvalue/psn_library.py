@@ -71,13 +71,11 @@ class PSNLibrary(GenericLibrary):
         for each_game_obj in all_games_objs:
             print("Game: ", each_game_obj.game_name)
             each_game_obj.weighted_rating = super().apply_weighted_game_rating(library_obj, each_game_obj)
-            super().update_game_obj(each_game_obj)
             self.set_psn_game_value(each_game_obj)
             super().update_game_obj(each_game_obj)
 
 
     def update_psn_lib(self, p_library_id):
-        count = 0
 
         # Get the Library Object from the DB
         library_obj = super().get_library_obj(p_library_id)
@@ -96,17 +94,17 @@ class PSNLibrary(GenericLibrary):
                     else:
                         self.update_psn_game(library_obj, game_obj)
 
+                    # Sleep for short time to space our requests to the PSN API.
                     time.sleep(1)
 
-                    #count += 1
-                    #if count == 5:
-                    #    break
             except Exception as e:
-                print("Exception processing game: ", e)
-                traceback.print_exc()
-                #break
+                # The PSN store has some inconsistencies. When I've seen KeyErrors for the PSN_JSON_ELEM_GAME_PRICE_BLOCK element
+                # its been because a game was still listed in the store for pre-order after it already came out. So ignore these.
+                if(PSN_JSON_ELEM_GAME_PRICE_BLOCK not in str(e)):
+                    print("Exception processing game: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
+                    traceback.print_exc()
 
-        # Update Library statistics for rating weighting
+        # Update Library statistics, such as std dev, for rating weighting
         super().update_library_statistics(library_obj)
 
     @transaction.atomic
@@ -120,14 +118,11 @@ class PSNLibrary(GenericLibrary):
         g_url = p_base_game_json[PSN_JSON_ELEM_GAME_URL]
         g_thumb = self.get_psn_thumbnail(p_base_game_json[PSN_JSON_ELEM_GAME_IMAGES])
         g_age = PSN_DEFAULT_AGE_RATING #TODO, set this correctly...
-        # print("Adding game: ", g_name, " - ", g_url)
         return super().add_skeleton_game_list_entry_to_db(g_id, g_name, g_url, g_thumb, g_age, p_library_obj)
 
     @transaction.atomic
     def update_psn_game(self, p_library_obj, p_game_obj):
-        # print("Updating game: ", p_game_obj.game_name)
         full_details_json = self.request_psn_game_json(p_game_obj)
-
         # Set the price
         self.set_psn_game_price(p_game_obj, full_details_json)
         # Set the ratings (both new ratings in psn and updated weighting)
@@ -157,7 +152,6 @@ class PSNLibrary(GenericLibrary):
         base_discount = 0
         plus_discount = 0
         if (PSN_JSON_ELEM_GAME_REWARDS in p_game_price_block_json) and (p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]):
-            #print(type(p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]))
             if PSN_JSON_ELEM_GAME_BASE_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
                 base_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
             if PSN_JSON_ELEM_GAME_BONUS_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
