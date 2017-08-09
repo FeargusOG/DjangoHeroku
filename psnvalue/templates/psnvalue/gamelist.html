@@ -17,7 +17,9 @@
             <td>{{ game.game_name }}</td>
             <td>{{ game.weighted_rating }}</td>
             <td>{{ game.plus_price }}</td>
+            {% if True %}
             <td>{{ game.plus_value_score }}</td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>
