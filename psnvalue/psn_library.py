@@ -103,7 +103,11 @@ class PSNLibrary(GenericLibrary):
         library_obj = super().get_library_obj(p_library_id)
 
         # Get the Library JSON
-        psn_lib_json = self.request_psn_lib_json(library_obj)
+        try:
+            psn_lib_json = self.request_psn_lib_json(library_obj)
+        except Exception as e:
+            traceback.print_exc()
+            return
         
         for eachGame in psn_lib_json[PSN_JSON_ELEM_EACH_GAME]:
             try:
@@ -111,9 +115,9 @@ class PSNLibrary(GenericLibrary):
                     print(eachGame[PSN_JSON_ELEM_GAME_NAME])
                     game_obj = super().get_game_obj(library_obj, eachGame[PSN_JSON_ELEM_GAME_ID])
 
-                    #count = count + 1
-                    #if(count == 6):
-                    #    break
+                    count = count + 1
+                    if(count == 6):
+                        break
 
                     # If this game doesn't exist in the DB yet, add a skeleton record and update below.
                     if(game_obj == None):
