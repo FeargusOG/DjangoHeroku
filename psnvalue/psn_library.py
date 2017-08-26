@@ -259,7 +259,7 @@ class PSNLibrary(GenericLibrary):
 
     def get_psn_lib_total_results(self, p_psn_lib_url):
         response_json = requests.get(p_psn_lib_url+'0')
-        print("URL: ", p_psn_lib_url+'0')
+        print("URL: ", p_psn_lib_url+'1')
         print("Status Code for Game Count request: ", print(response_json.status_code))
         print("Text for Game Count request: ", print(response_json.text))
         psn_lib_json = response_json.json()
