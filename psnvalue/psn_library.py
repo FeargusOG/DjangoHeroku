@@ -269,7 +269,7 @@ class PSNLibrary(GenericLibrary):
         response_json = requests.get(p_psn_lib_url+str(p_count_to_fetch))
         print("\n\nHERE WE ARE GOING TO PRINT THE JSON!!\n\n")
         print("Status Code: ", response_json.status_code)
-        print(response_json.text)
+        #print(response_json.text)
         print("\n\nHERE WE ARE DONE PRINTING THE JSON!!\n\n")
         psn_lib_json = response_json.json()
         return psn_lib_json
