@@ -115,9 +115,9 @@ class PSNLibrary(GenericLibrary):
                     print(eachGame[PSN_JSON_ELEM_GAME_NAME])
                     game_obj = super().get_game_obj(library_obj, eachGame[PSN_JSON_ELEM_GAME_ID])
 
-                    count = count + 1
-                    if(count == 6):
-                        break
+                    #count = count + 1
+                    #if(count == 6):
+                    #    break
 
                     # If this game doesn't exist in the DB yet, add a skeleton record and update below.
                     if(game_obj == None):
@@ -126,7 +126,7 @@ class PSNLibrary(GenericLibrary):
                         self.update_psn_game(library_obj, game_obj)
 
                     # Sleep for short time to space our requests to the PSN API.
-                    time.sleep(1)
+                    time.sleep(2)
 
             except Exception as e:
                 # The PSN store has some inconsistencies. When I've seen KeyErrors for the PSN_JSON_ELEM_GAME_PRICE_BLOCK element
@@ -261,7 +261,8 @@ class PSNLibrary(GenericLibrary):
         response_json = requests.get(p_psn_lib_url+'0')
         print("URL: ", p_psn_lib_url+'1')
         print("Status Code for Game Count request: ", print(response_json.status_code))
-        print("Text for Game Count request: ", print(response_json.text))
+        # Sleep for short time to space our requests to the PSN API.
+        time.sleep(5)
         psn_lib_json = response_json.json()
         return psn_lib_json[PSN_JSON_ELEM_TOTAL_RESULTS]
 
