@@ -259,6 +259,7 @@ class PSNLibrary(GenericLibrary):
 
     def get_psn_lib_total_results(self, p_psn_lib_url):
         response_json = requests.get(p_psn_lib_url+'0')
+        print("Status Code for Game Count request: ", print(response_json.text))
         psn_lib_json = response_json.json()
         return psn_lib_json[PSN_JSON_ELEM_TOTAL_RESULTS]
 
@@ -267,10 +268,7 @@ class PSNLibrary(GenericLibrary):
         #with open('staticfiles/psnvalue/TotalPS4GameLibrary.json') as data_file:    
         #    psn_lib_json = json.load(data_file)
         response_json = requests.get(p_psn_lib_url+str(p_count_to_fetch))
-        print("\n\nHERE WE ARE GOING TO PRINT THE JSON!!\n\n")
-        print("Status Code: ", response_json.status_code)
-        #print(response_json.text)
-        print("\n\nHERE WE ARE DONE PRINTING THE JSON!!\n\n")
+        print("Status Code for Library List request: ", print(response_json.text))
         psn_lib_json = response_json.json()
         return psn_lib_json
 
