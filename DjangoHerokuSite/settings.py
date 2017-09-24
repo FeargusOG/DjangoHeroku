@@ -12,19 +12,25 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import dj_database_url
 
-#Test git push from VM
+###### Quick-start development settings - unsuitable for production ######
+# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+
+# Check if we are in PROD or DEV
+production_env = True
+if(os.environ['ENV_TYPE'] == 'DEV'):
+    production_env = False
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
-
 SECRET_KEY = os.environ['SECRET_KEY_VAL']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if production_env:
+    DEBUG = False
+else:
+    DEBUG = True
 
 # CELERY STUFF
 REDIS_URL_VAL = os.environ['REDIS_URL']
