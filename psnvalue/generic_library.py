@@ -41,7 +41,7 @@ class GenericLibrary:
         return GameList.objects.filter(library_fk=p_library_obj).values_list('rating', flat=True)
 
     def calculate_standard_deviation(self, p_list_of_ratings):
-        if p_list_of_ratings: 
+        if p_list_of_ratings:
             return pstdev(p_list_of_ratings)
         else:
             return DEFAULT_STDEV
@@ -63,8 +63,8 @@ class GenericLibrary:
             pass
         return game_obj
 
-    def add_skeleton_game_list_entry_to_db(self, p_g_id, p_g_name, p_g_url, p_g_thumb, p_g_age, p_library_obj):
-        return GameList.objects.create(game_id=p_g_id, game_name=p_g_name, json_url=p_g_url, image_url=p_g_thumb, age_rating=p_g_age, library_fk=p_library_obj)
+    def add_skeleton_game_list_entry_to_db(self, p_g_id, p_g_name, p_g_url, p_g_thumb, p_g_thumb_b64, p_g_age, p_library_obj):
+        return GameList.objects.create(game_id=p_g_id, game_name=p_g_name, json_url=p_g_url, image_url=p_g_thumb, image_data=p_g_thumb_b64, age_rating=p_g_age, library_fk=p_library_obj)
 
     # Calculate value based on the price and discount relative to the weighted rating.
     def calculate_game_value(self, p_game_obj, p_plus):
@@ -91,18 +91,18 @@ class GenericLibrary:
             game_rating = ((p_game_obj.weighted_rating)*discount_weight)*100
         else:
             game_rating = ((p_game_obj.weighted_rating)/discount_weight)*100
-        
-        return round(1/(game_price/game_rating)*100) 
+
+        return round(1/(game_price/game_rating)*100)
 
     # Apply a weight based on the rating deviation from the mean and the count of ratings.
     def apply_weighted_game_rating(self, p_library_obj, p_game_obj):
-        # Determine if this game is above or below the mean rating. 
+        # Determine if this game is above or below the mean rating.
         # Necessary for applying different weighting algorithm.
         aboveMean = self.rating_above_mean(p_game_obj)
 
         # Determine the weight to apply to rating count.
         countVal = (float(p_game_obj.rating_count)/125)
-        
+
         # Determine weighting to apply based on rating deviation from the mean.
         ratingConstant = 1 if aboveMean else -1
         ratingVal = round((float(p_game_obj.rating)) * (ratingConstant+((float(p_game_obj.rating) - DEFAULT_MEAN)/DEFAULT_STDEV)),2)

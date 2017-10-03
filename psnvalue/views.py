@@ -34,3 +34,9 @@ def updateweightedrating(request, library_id):
         raise Http404("You do not have access to this resource.")
     library_manager.update_weighted_rating(library_id)
     return HttpResponse("You're at the psnvalue update weighted rating.")
+
+def updategamethumbs(request, library_id):
+    if not request.user.is_staff:
+        raise Http404("You do not have access to this resource.")
+    library_manager.update_psn_game_thumbnails(library_id)
+    return HttpResponse("You're at the psnvalue update game thumbs.")

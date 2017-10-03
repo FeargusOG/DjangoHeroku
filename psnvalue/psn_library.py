@@ -3,10 +3,12 @@ import requests
 import collections
 import time
 import traceback
+import base64
 from django.db import transaction
 from django.utils import timezone
 from datetime import datetime
 from .generic_library import GenericLibrary
+from urllib.request import urlopen
 
 #PSN Library Name
 PSN_MODEL_LIBRARY_NAME = 'PS4'
@@ -83,6 +85,19 @@ PSN_JSON_ELEM_GAME_CONTENT_DESCR = 'description'
 
 class PSNLibrary(GenericLibrary):
 
+    # This is temporary migration function for migrating thumbnail data into the db
+    def update_psn_game_thumbnails(self, p_library_id):
+        # Get the Library Object from the DB
+        library_obj = super().get_library_obj(p_library_id)
+
+        # Get all games from the DB
+        all_games_objs = super().get_all_game_objs(library_obj)
+
+        for each_game_obj in all_games_objs:
+            print("Game: ", each_game_obj.game_name)
+            each_game_obj.image_data = self.get_psn_thumbnail_as_base64_str(each_game_obj.image_url)
+            super().update_game_obj(each_game_obj)
+
     # This is used for applying updates to the rating weighting algorithm
     def update_psn_weighted_ratings(self, p_library_id):
         # Get the Library Object from the DB
@@ -108,7 +123,7 @@ class PSNLibrary(GenericLibrary):
         except Exception as e:
             traceback.print_exc()
             return
-        
+
         for eachGame in psn_lib_json[PSN_JSON_ELEM_EACH_GAME]:
             try:
                 if(self.game_is_valid(eachGame)):
@@ -149,8 +164,9 @@ class PSNLibrary(GenericLibrary):
         g_name = p_base_game_json[PSN_JSON_ELEM_GAME_NAME]
         g_url = p_base_game_json[PSN_JSON_ELEM_GAME_URL]
         g_thumb = self.get_psn_thumbnail(p_base_game_json[PSN_JSON_ELEM_GAME_IMAGES])
+        g_thumb_b64 = self.get_psn_thumbnail_as_base64_str(g_thumb)
         g_age = PSN_DEFAULT_AGE_RATING #TODO, set this correctly...
-        return super().add_skeleton_game_list_entry_to_db(g_id, g_name, g_url, g_thumb, g_age, p_library_obj)
+        return super().add_skeleton_game_list_entry_to_db(g_id, g_name, g_url, g_thumb, g_thumb_b64, g_age, p_library_obj)
 
     @transaction.atomic
     def update_psn_game(self, p_library_obj, p_game_obj):
@@ -173,7 +189,6 @@ class PSNLibrary(GenericLibrary):
                 #print(eachContentDescr[PSN_JSON_ELEM_GAME_CONTENT_NAME])
                 content_descriptor = super().get_or_create_content_descriptor(eachContentDescr[PSN_JSON_ELEM_GAME_CONTENT_NAME], eachContentDescr[PSN_JSON_ELEM_GAME_CONTENT_DESCR])
                 super().get_or_create_game_content(p_game_obj, content_descriptor)
-                
 
     def set_psn_game_price(self, p_game_obj, p_game_full_details_json):
         # Set the standard price of the game
@@ -231,6 +246,10 @@ class PSNLibrary(GenericLibrary):
                 break
         return game_thumb
 
+    def get_psn_thumbnail_as_base64_str(self, p_thumbnail_url):
+        image_file = urlopen(p_thumbnail_url)
+        return base64.b64encode(image_file.read())
+
     def game_is_valid(self, p_game_json):
         game_valid = True
         # We're just looking for base games i.e. ignore bundles etc.
@@ -269,7 +288,7 @@ class PSNLibrary(GenericLibrary):
 
     def make_psn_lib_json_api_request(self, p_psn_lib_url, p_count_to_fetch):
         #File for testing only - live version will pull json from psn api
-        #with open('staticfiles/psnvalue/TotalPS4GameLibrary.json') as data_file:    
+        #with open('staticfiles/psnvalue/TotalPS4GameLibrary.json') as data_file:
         #    psn_lib_json = json.load(data_file)
         response_json = requests.get(p_psn_lib_url+str(p_count_to_fetch))
         print("Status Code for Library List request: ", print(response_json.status_code))

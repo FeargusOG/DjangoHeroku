@@ -24,6 +24,7 @@ class GameList(models.Model):
     game_name = models.TextField()
     json_url = models.TextField()
     image_url = models.TextField()
+    image_data = models.TextField()
     age_rating = models.IntegerField(default=0)
     library_fk = models.ForeignKey(Library, on_delete=models.CASCADE)
     last_updated = models.DateTimeField(default=timezone.now)
