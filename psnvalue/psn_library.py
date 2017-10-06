@@ -44,8 +44,10 @@ PSN_JSON_ELEM_GAME_PS4_PFORM = 'PS4™'
 PSN_JSON_ELEM_GAME_IMAGES = 'images'
 #PSN Game Image type JSON element
 PSN_JSON_ELEM_GAME_IMGTYPE = 'type'
-#PSN Game Image thumb type
-PSN_JSON_ELEM_GAME_IMGTYPE_THUMB = 1
+#PSN Game Image large thumb
+PSN_JSON_ELEM_GAME_IMGTYPE_THUMB_LRG = 1
+#PSN Game Image small thumb
+PSN_JSON_ELEM_GAME_IMGTYPE_THUMB_SML = 2
 #PSN Main Game details block - This element is part of both the library and game JSON!
 PSN_JSON_ELEM_GAME_PRICE_BLOCK = 'default_sku'
 
@@ -87,16 +89,45 @@ class PSNLibrary(GenericLibrary):
 
     # This is temporary migration function for migrating thumbnail data into the db
     def update_psn_game_thumbnails(self, p_library_id):
+        count = 0
+
         # Get the Library Object from the DB
         library_obj = super().get_library_obj(p_library_id)
 
-        # Get all games from the DB
-        all_games_objs = super().get_all_game_objs(library_obj)
+        # Get the Library JSON
+        try:
+            psn_lib_json = self.request_psn_lib_json(library_obj)
+        except Exception as e:
+            traceback.print_exc()
+            return
 
-        for each_game_obj in all_games_objs:
-            print("Game: ", each_game_obj.game_name)
-            each_game_obj.image_data = self.get_psn_thumbnail_as_base64_str(each_game_obj.image_url)
-            super().update_game_obj(each_game_obj)
+        for eachGame in psn_lib_json[PSN_JSON_ELEM_EACH_GAME]:
+            try:
+                if(self.game_is_valid(eachGame)):
+                    print(eachGame[PSN_JSON_ELEM_GAME_NAME])
+                    game_obj = super().get_game_obj(library_obj, eachGame[PSN_JSON_ELEM_GAME_ID])
+
+                    #count = count + 1
+                    #if(count == 6):
+                    #    break
+
+                    if(game_obj == None):
+                        continue
+                    else:
+                        if(game_obj.game_name == "Outlast"):
+                            print("Found ", game_obj.game_name)
+                            game_obj.image_url = self.get_psn_thumbnail(eachGame[PSN_JSON_ELEM_GAME_IMAGES])
+                            game_obj.image_data = self.get_psn_thumbnail_as_base64_str(game_obj.image_url)
+                            super().update_game_obj(game_obj)
+
+                    # Sleep for short time to space our requests to the PSN API.
+                    #time.sleep(2)
+            except Exception as e:
+                # The PSN store has some inconsistencies. When I've seen KeyErrors for the PSN_JSON_ELEM_GAME_PRICE_BLOCK element
+                # its been because a game was still listed in the store for pre-order after it already came out. So ignore these.
+                if(PSN_JSON_ELEM_GAME_PRICE_BLOCK not in str(e)):
+                    print("Exception processing game: ", eachGame[PSN_JSON_ELEM_GAME_NAME])
+                    traceback.print_exc()
 
     # This is used for applying updates to the rating weighting algorithm
     def update_psn_weighted_ratings(self, p_library_id):
@@ -241,7 +272,7 @@ class PSNLibrary(GenericLibrary):
     def get_psn_thumbnail(self, p_image_list):
         game_thumb = None
         for eachGameImg in p_image_list:
-            if eachGameImg[PSN_JSON_ELEM_GAME_IMGTYPE] == PSN_JSON_ELEM_GAME_IMGTYPE_THUMB:
+            if eachGameImg[PSN_JSON_ELEM_GAME_IMGTYPE] == PSN_JSON_ELEM_GAME_IMGTYPE_THUMB_SML:
                 game_thumb = eachGameImg[PSN_JSON_ELEM_GAME_URL]
                 break
         return game_thumb
