@@ -114,11 +114,10 @@ class PSNLibrary(GenericLibrary):
                     if(game_obj == None):
                         continue
                     else:
-                        if(game_obj.game_name == "Outlast"):
-                            print("Found ", game_obj.game_name)
-                            game_obj.image_url = self.get_psn_thumbnail(eachGame[PSN_JSON_ELEM_GAME_IMAGES])
-                            game_obj.image_data = self.get_psn_thumbnail_as_base64_str(game_obj.image_url)
-                            super().update_game_obj(game_obj)
+                        print("Found ", game_obj.game_name)
+                        game_obj.image_url = self.get_psn_thumbnail(eachGame[PSN_JSON_ELEM_GAME_IMAGES])
+                        game_obj.image_data = self.get_psn_thumbnail_as_base64_str(game_obj.image_url)
+                        super().update_game_obj(game_obj)
 
                     # Sleep for short time to space our requests to the PSN API.
                     #time.sleep(2)
