@@ -107,9 +107,9 @@ class PSNLibrary(GenericLibrary):
             image_file = urlopen(each_game_obj.image_url)
             super().update_game_obj(each_game_obj)
 
-            count = count + 1
-            if(count == 1):
-                break
+            #count = count + 1
+            #if(count == 1):
+            #    break
 
     # This is temporary migration function for migrating thumbnail data into the db
     def update_psn_game_thumbnails(self, p_library_id):
