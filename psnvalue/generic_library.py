@@ -63,8 +63,8 @@ class GenericLibrary:
             pass
         return game_obj
 
-    def add_skeleton_game_list_entry_to_db(self, p_g_id, p_g_name, p_g_url, p_g_thumb, p_g_thumb_b64, p_g_age, p_library_obj):
-        return GameList.objects.create(game_id=p_g_id, game_name=p_g_name, json_url=p_g_url, image_url=p_g_thumb, image_data=p_g_thumb_b64, age_rating=p_g_age, library_fk=p_library_obj)
+    def add_skeleton_game_list_entry_to_db(self, p_g_id, p_g_name, p_g_url, p_g_thumb, p_g_thumb_datastore, p_g_age, p_library_obj):
+        return GameList.objects.create(game_id=p_g_id, game_name=p_g_name, json_url=p_g_url, image_url=p_g_thumb, image_datastore_url=p_g_thumb_datastore, age_rating=p_g_age, library_fk=p_library_obj)
 
     # Calculate value based on the price and discount relative to the weighted rating.
     def calculate_game_value(self, p_game_obj, p_plus):

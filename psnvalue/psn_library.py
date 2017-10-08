@@ -11,7 +11,6 @@ from django.db import transaction
 from django.utils import timezone
 from datetime import datetime
 from .generic_library import GenericLibrary
-from urllib.request import urlopen
 
 #PSN Library Name
 PSN_MODEL_LIBRARY_NAME = 'PS4'
@@ -101,10 +100,7 @@ class PSNLibrary(GenericLibrary):
 
         for each_game_obj in all_games_objs:
             print("Game: ", each_game_obj.game_name)
-            upload_result = cloudinary.uploader.upload(each_game_obj.image_url)
-            print(upload_result)
-            each_game_obj.image_datastore_url = upload_result['url']
-            image_file = urlopen(each_game_obj.image_url)
+            each_game_obj.image_datastore_url = self.upload_thumb_to_cloudinary(game_obj.image_url)
             super().update_game_obj(each_game_obj)
 
             #count = count + 1
@@ -140,7 +136,7 @@ class PSNLibrary(GenericLibrary):
                     else:
                         print("Found ", game_obj.game_name)
                         game_obj.image_url = self.get_psn_thumbnail(eachGame[PSN_JSON_ELEM_GAME_IMAGES])
-                        game_obj.image_data = self.get_psn_thumbnail_as_base64_str(game_obj.image_url)
+                        game_obj.image_datastore_url = self.upload_thumb_to_cloudinary(game_obj.image_url)
                         super().update_game_obj(game_obj)
 
                     # Sleep for short time to space our requests to the PSN API.
@@ -218,9 +214,9 @@ class PSNLibrary(GenericLibrary):
         g_name = p_base_game_json[PSN_JSON_ELEM_GAME_NAME]
         g_url = p_base_game_json[PSN_JSON_ELEM_GAME_URL]
         g_thumb = self.get_psn_thumbnail(p_base_game_json[PSN_JSON_ELEM_GAME_IMAGES])
-        g_thumb_b64 = self.get_psn_thumbnail_as_base64_str(g_thumb)
+        g_thumb_datastore = self.upload_thumb_to_cloudinary(g_thumb)
         g_age = PSN_DEFAULT_AGE_RATING #TODO, set this correctly...
-        return super().add_skeleton_game_list_entry_to_db(g_id, g_name, g_url, g_thumb, g_thumb_b64, g_age, p_library_obj)
+        return super().add_skeleton_game_list_entry_to_db(g_id, g_name, g_url, g_thumb, g_thumb_datastore, g_age, p_library_obj)
 
     @transaction.atomic
     def update_psn_game(self, p_library_obj, p_game_obj):
@@ -300,9 +296,9 @@ class PSNLibrary(GenericLibrary):
                 break
         return game_thumb
 
-    def get_psn_thumbnail_as_base64_str(self, p_thumbnail_url):
-        image_file = urlopen(p_thumbnail_url)
-        return base64.b64encode(image_file.read())
+    def upload_thumb_to_cloudinary(self, p_thumbnail_url):
+        upload_result = cloudinary.uploader.upload(each_game_obj.image_url)
+        return upload_result['url']
 
     def game_is_valid(self, p_game_json):
         game_valid = True
