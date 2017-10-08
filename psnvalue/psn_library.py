@@ -4,6 +4,9 @@ import collections
 import time
 import traceback
 import base64
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 from django.db import transaction
 from django.utils import timezone
 from datetime import datetime
@@ -86,6 +89,27 @@ PSN_JSON_ELEM_GAME_CONTENT_DESCR = 'description'
 
 
 class PSNLibrary(GenericLibrary):
+
+    def upload_thumbnails_to_cloudinary(self, p_library_id):
+        count = 0
+
+        # Get the Library Object from the DB
+        library_obj = super().get_library_obj(p_library_id)
+
+        # Get all games from the DB
+        all_games_objs = super().get_all_game_objs(library_obj)
+
+        for each_game_obj in all_games_objs:
+            print("Game: ", each_game_obj.game_name)
+            upload_result = cloudinary.uploader.upload(each_game_obj.image_url)
+            print(upload_result)
+            each_game_obj.image_datastore_url = upload_result['url']
+            image_file = urlopen(each_game_obj.image_url)
+            super().update_game_obj(each_game_obj)
+
+            count = count + 1
+            if(count == 1):
+                break
 
     # This is temporary migration function for migrating thumbnail data into the db
     def update_psn_game_thumbnails(self, p_library_id):

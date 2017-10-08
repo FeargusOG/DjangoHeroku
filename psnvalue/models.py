@@ -23,22 +23,24 @@ class GameList(models.Model):
     game_id = models.TextField(unique=True)
     game_name = models.TextField()
     json_url = models.TextField()
-    image_url = models.TextField()
-    image_data = models.TextField()
     age_rating = models.IntegerField(default=0)
     library_fk = models.ForeignKey(Library, on_delete=models.CASCADE)
     last_updated = models.DateTimeField(default=timezone.now)
-    #Price fields
+    # Thumbnail fields
+    image_url = models.TextField()
+    image_data = models.TextField()
+    image_datastore_url = models.TextField(blank=True)
+    # Price fields
     price = models.FloatField(default=0.0)
     base_price = models.FloatField(default=0.0)
     plus_price = models.FloatField(default=0.0)
     base_discount = models.IntegerField(default=0)
     plus_discount = models.IntegerField(default=0)
-    #Rating fields
+    # Rating fields
     rating = models.FloatField(default=0.0)
     rating_count = models.IntegerField(default=0)
     weighted_rating = models.FloatField(default=0.0)
-    #Value fields
+    # Value fields
     base_value_score = models.IntegerField(default=0)
     plus_value_score = models.IntegerField(default=0)
 

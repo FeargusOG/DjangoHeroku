@@ -16,7 +16,7 @@ class IndexView(generic.ListView):
 class GameListView(generic.ListView):
     template_name = 'psnvalue/gamelist.html'
     context_object_name = 'game_list'
-    paginate_by = 50
+    paginate_by = 40
 
     def get_queryset(self):
         return GameList.objects.filter(rating_count__gte=50, price__gte=1).order_by('-plus_value_score')

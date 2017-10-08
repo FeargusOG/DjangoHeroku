@@ -21,4 +21,5 @@ def user_update_weighted_rating(p_library_id):
 def user_update_game_thumbnails(p_library_id):
     logger.info("About to update the thumbnails in the PSN library")
     psn_library = PSNLibrary()
-    psn_library.update_psn_game_thumbnails(p_library_id)
+    #psn_library.update_psn_game_thumbnails(p_library_id)
+    psn_library.upload_thumbnails_to_cloudinary(p_library_id)

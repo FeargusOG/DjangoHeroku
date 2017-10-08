@@ -7,3 +7,4 @@ requests==2.14.2
 celery==4.0.2
 redis==2.10.5
 django-celery-beat==1.0.1
+cloudinary==1.8.0
