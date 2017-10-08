@@ -14,7 +14,7 @@
         </tr>
         {% for game in game_list %}
         <tr>
-            <td><img src="data:image/png;base64,{{ game.image_data }}" height="80" width="80"/></td>
+            <td><img src="{{ game.image_datastore_url }}" height="80" width="80"/></td>
             <td>{{ game.game_name }}</td>
             <td>{{ game.weighted_rating }}</td>
             <td>{{ game.plus_price }}</td>
