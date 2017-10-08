@@ -28,7 +28,6 @@ class GameList(models.Model):
     last_updated = models.DateTimeField(default=timezone.now)
     # Thumbnail fields
     image_url = models.TextField()
-    image_data = models.TextField()
     image_datastore_url = models.TextField(blank=True)
     # Price fields
     price = models.FloatField(default=0.0)
