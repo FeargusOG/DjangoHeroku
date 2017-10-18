@@ -297,7 +297,7 @@ class PSNLibrary(GenericLibrary):
         return game_thumb
 
     def upload_thumb_to_cloudinary(self, p_thumbnail_url):
-        upload_result = cloudinary.uploader.upload(each_game_obj.image_url)
+        upload_result = cloudinary.uploader.upload(p_thumbnail_url)
         return upload_result['url']
 
     def game_is_valid(self, p_game_json):
