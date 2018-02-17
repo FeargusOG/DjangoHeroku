@@ -7,8 +7,13 @@ from django.http import Http404
 from .models import Library, GameList
 
 class IndexView(generic.ListView):
-    template_name = 'psnvalue/index.html'
     context_object_name = 'library_list'
+
+    def get_template_names(self):
+        if self.request.user.is_staff:
+            return ['psnvalue/index_admin.html']
+        else:
+            return ['psnvalue/index.html']
 
     def get_queryset(self):
         return Library.objects.all()
