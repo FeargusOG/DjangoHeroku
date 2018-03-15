@@ -2,7 +2,8 @@
 
 ### Tech:
 
-|![Python](readme/python.png "Python")|
-|![Django](readme/django.png "Django")|
-|![Redis](readme/redis.png "Redis")|
-|![Celery](readme/celery.png "Celery")|
+| ------ | ------ |
+| ![Python](readme/python.png "Python") | Python |
+| ![Django](readme/django.png "Django") | Django |
+| ![Redis](readme/redis.png "Redis") | Redis |
+| ![Celery](readme/celery.png "Celery") | Celery |
