@@ -2,7 +2,7 @@
 
 ### Tech:
 
-| Thumb  | Name   |
+|   | Name   |
 | ------ | ------ |
 | ![Python](readme/python.png "Python") | Python |
 | ![Django](readme/django.png "Django") | Django |
