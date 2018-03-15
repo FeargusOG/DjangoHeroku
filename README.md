@@ -2,6 +2,4 @@
 
 > List of Technologies:
 
-![Celery](readme/celery.png "Celery") - Celery
-
-![Redis](readme/redis.png "Redis") - Redis
+![Celery](readme/celery.png "Celery")  ![Redis](readme/redis.png "Redis")
