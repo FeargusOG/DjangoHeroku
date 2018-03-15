@@ -1,7 +1,10 @@
 # Heroku Django
 
 List of Technologies:
+
 ![Celery](readme/celery.png "Celery")
+
+![Redis](readme/redis.png "Redis")
 
 List of Apps:
    > PSNValue: List PS4 games and their current value - http://www.feargusogorman.com/psnvalue/gamelist/
