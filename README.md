@@ -16,3 +16,6 @@
 | ![Psycopg](readme/psycopg.png "Psycopg") | Psycopg | PostgreSQL for Python |
 | ![Heroku](readme/heroku.png "Heroku") | Heroku | PAAS Provider |
 | ![Cloudinary](readme/cloudinary.png "Cloudinary") | Cloudinary | SAAS Image and Video Serving |
+
+
+##Description:
