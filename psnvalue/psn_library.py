@@ -100,7 +100,7 @@ class PSNLibrary(GenericLibrary):
 
         for each_game_obj in all_games_objs:
             print("Game: ", each_game_obj.game_name)
-            each_game_obj.image_datastore_url = self.upload_thumb_to_cloudinary(game_obj.image_url)
+            each_game_obj.image_datastore_url = self.upload_thumb_to_cloudinary(each_game_obj.image_url)
             super().update_game_obj(each_game_obj)
 
             #count = count + 1

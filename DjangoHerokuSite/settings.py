@@ -44,7 +44,6 @@ CELERY_TIMEZONE = 'UTC'
 # Application definition
 
 INSTALLED_APPS = [
-    'polls.apps.PollsConfig',
     'psnvalue.apps.PsnvalueConfig',
     'django.contrib.admin',
     'django.contrib.auth',
