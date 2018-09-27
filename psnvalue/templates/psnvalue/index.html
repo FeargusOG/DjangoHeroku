@@ -5,7 +5,7 @@
 {% if library_list %}
     <ul>
     {% for library in library_list %}
-       <li>{{ library.library_name }} --- Last Updated: {{ library.last_updated }}</li>
+       <li><a href="{% url 'psnvalue:gamelist' library.id %}">{{ library.library_name }}</a> --- Last Updated: {{ library.last_updated }}</li>
     {% endfor %}
     </ul>
 {% else %}
