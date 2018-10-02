@@ -1,0 +1,1340 @@
+{
+  "age_limit": 16,
+  "attributes": {
+    "facets": {
+      "game_content_type": [
+        {
+          "name": "Add-Ons",
+          "count": 2,
+          "key": "addons"
+        },
+        {
+          "name": "Bundles",
+          "count": 1,
+          "key": "bundles"
+        },
+        {
+          "name": "Themes",
+          "count": 1,
+          "key": "themes"
+        }
+      ],
+      "subtitle_lang": [
+        {
+          "name": "de",
+          "count": 1,
+          "key": "de"
+        },
+        {
+          "name": "en",
+          "count": 1,
+          "key": "en"
+        },
+        {
+          "name": "es",
+          "count": 1,
+          "key": "es"
+        },
+        {
+          "name": "fr",
+          "count": 1,
+          "key": "fr"
+        },
+        {
+          "name": "it",
+          "count": 1,
+          "key": "it"
+        },
+        {
+          "name": "pl",
+          "count": 1,
+          "key": "pl"
+        },
+        {
+          "name": "ru",
+          "count": 1,
+          "key": "ru"
+        }
+      ],
+      "sub_category": [
+        {
+          "name": "Other",
+          "count": 1,
+          "key": "other"
+        }
+      ],
+      "release_date": [
+        {
+          "name": "Last 30 Days",
+          "count": 1,
+          "key": "last_30_days"
+        }
+      ],
+      "price": [
+        {
+          "name": "Free",
+          "count": 1,
+          "key": "0-0"
+        },
+        {
+          "name": "Under €1",
+          "count": 1,
+          "key": "0-99"
+        },
+        {
+          "name": "€10.00 - €19.99",
+          "count": 2,
+          "key": "1000-1999"
+        },
+        {
+          "name": "€20.00 - €29.99",
+          "count": 1,
+          "key": "2000-2999"
+        },
+        {
+          "name": "Over €60",
+          "count": 1,
+          "key": "6000-*"
+        }
+      ],
+      "addon_type": [
+        {
+          "name": "Games",
+          "count": 1,
+          "key": "games"
+        },
+        {
+          "name": "Level/Mission Maps",
+          "count": 2,
+          "key": "level_mission_maps"
+        }
+      ],
+      "genre": [
+        {
+          "name": "Action",
+          "count": 5,
+          "key": "action"
+        },
+        {
+          "name": "Adventure",
+          "count": 5,
+          "key": "adventure"
+        },
+        {
+          "name": "Role-Playing Games (RPG)",
+          "count": 5,
+          "key": "role_playing_games"
+        }
+      ],
+      "top_category": [
+        {
+          "name": "Add-On",
+          "count": 3,
+          "key": "add_on"
+        },
+        {
+          "name": "Downloadable Game",
+          "count": 1,
+          "key": "downloadable_game"
+        },
+        {
+          "name": "Theme",
+          "count": 1,
+          "key": "theme"
+        }
+      ],
+      "relationship": [
+        {
+          "name": "Add-Ons",
+          "count": 3,
+          "key": "addons"
+        },
+        {
+          "name": "Bundles",
+          "count": 1,
+          "key": "bundles"
+        },
+        {
+          "name": "Themes",
+          "count": 1,
+          "key": "themes"
+        }
+      ]
+    },
+    "next": []
+  },
+  "bucket": "games",
+  "cloud_only_platform": [
+    "NONE"
+  ],
+  "container_type": "product",
+  "content_descriptors": [
+    {
+      "description": "Online",
+      "url": "https://cdn-a.sonyentertainmentnetwork.com/grc/images/descriptors/sd/pegi/online.png",
+      "name": "Online"
+    },
+    {
+      "description": "Violence",
+      "url": "https://cdn-a.sonyentertainmentnetwork.com/grc/images/descriptors/sd/pegi/violence.png",
+      "name": "Violence"
+    }
+  ],
+  "content_origin": 0,
+  "content_rating": {
+    "description": "PEGI 16+",
+    "rating_system": "PEGI",
+    "url": "https://cdn-a.sonyentertainmentnetwork.com/grc/images/ratings/hd/pegi/16.png"
+  },
+  "content_type": "1",
+  "default_sku": {
+    "amortizeFlag": false,
+    "bundleExclusiveFlag": false,
+    "chargeImmediatelyFlag": false,
+    "charge_type_id": 0,
+    "credit_card_required_flag": 0,
+    "defaultSku": true,
+    "display_price": "€69.99",
+    "eligibilities": [],
+    "entitlements": [
+      {
+        "description": null,
+        "drms": [],
+        "duration": 0,
+        "durationOverrideTypeId": null,
+        "exp_after_first_use": 0,
+        "feature_type_id": 3,
+        "id": "EP0700-CUSA03365_00-DARKSOULS3000000",
+        "license_type": 0,
+        "metadata": {
+          "voiceLanguageCode": [
+            "en"
+          ],
+          "subtitleLanguageCode": [
+            "de",
+            "ru",
+            "en",
+            "it",
+            "fr",
+            "pl",
+            "es"
+          ]
+        },
+        "name": "DARK SOULS™ III",
+        "packageType": "PS4GD",
+        "packages": [
+          {
+            "platformId": 13,
+            "platformName": "ps4",
+            "size": 18258001920
+          }
+        ],
+        "preorder_placeholder_flag": false,
+        "size": 0,
+        "subType": 0,
+        "subtitle_language_codes": [
+          "de",
+          "ru",
+          "en",
+          "it",
+          "fr",
+          "pl",
+          "es"
+        ],
+        "type": 5,
+        "use_count": 0,
+        "voice_language_codes": [
+          "en"
+        ]
+      }
+    ],
+    "id": "EP0700-CUSA03365_00-DARKSOULS3000000-E001",
+    "is_original": false,
+    "name": "Full Game",
+    "platforms": [
+      0,
+      10,
+      13
+    ],
+    "price": 6999,
+    "rewards": [],
+    "seasonPassExclusiveFlag": false,
+    "skuAvailabilityOverrideFlag": false,
+    "sku_type": 0,
+    "type": "standard"
+  },
+  "dob_required": false,
+  "gameContentTypesList": [
+    {
+      "name": "Full Game",
+      "key": "FULL_GAME"
+    }
+  ],
+  "game_contentType": "Full Game",
+  "id": "EP0700-CUSA03365_00-DARKSOULS3000000",
+  "images": [
+    {
+      "type": 1,
+      "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/cxXjTNA4nulirSbyU8NUCnhphaYYuARj.png"
+    },
+    {
+      "type": 2,
+      "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/fdxuaIMYkUxHQ3pHgXNZIF9eEQJBsF1p.png"
+    },
+    {
+      "type": 9,
+      "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/D9RzEhL62DnTSTqQgnSPPdQvFCb5Ou2Q.png"
+    },
+    {
+      "type": 10,
+      "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/OFMeAw2KhrdaEZAjW1f3tCIXbogkLpTC.png"
+    },
+    {
+      "type": 12,
+      "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/qsTwjS2DRCR6a4zNdB7KzYj8ToU20oKj.jpg"
+    },
+    {
+      "type": 13,
+      "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/UzXzk746RxJF125kpzhyHMPfkEILg1uw.png"
+    }
+  ],
+  "links": [
+    {
+      "bucket": "games",
+      "container_type": "product",
+      "content_type": "1",
+      "default_sku": {
+        "amortizeFlag": false,
+        "bundleExclusiveFlag": false,
+        "chargeImmediatelyFlag": false,
+        "charge_type_id": 0,
+        "credit_card_required_flag": 0,
+        "defaultSku": true,
+        "display_price": "€14.99",
+        "eligibilities": [
+          {
+            "id": "EP0700-CUSA03365_00-SPASS0",
+            "operand": "IS_ACTIVE",
+            "operator": "FALSE",
+            "name": "DARK SOULS™ III - Season Pass",
+            "description": null,
+            "entitlement_type": null,
+            "drms": []
+          }
+        ],
+        "entitlements": [
+          {
+            "description": null,
+            "drms": [],
+            "duration": 0,
+            "durationOverrideTypeId": null,
+            "exp_after_first_use": 0,
+            "feature_type_id": 0,
+            "id": "EP0700-CUSA03365_00-DARKSOULS3DLC002",
+            "license_type": 0,
+            "metadata": null,
+            "name": "DARK SOULS™ III: The Ringed City™",
+            "packageType": "PS4AC",
+            "packages": [
+              {
+                "platformId": 13,
+                "platformName": "ps4",
+                "size": 3039363072
+              }
+            ],
+            "preorder_placeholder_flag": false,
+            "size": 0,
+            "subType": 0,
+            "subtitle_language_codes": null,
+            "type": 5,
+            "use_count": 0,
+            "voice_language_codes": null
+          }
+        ],
+        "id": "EP0700-CUSA03365_00-DARKSOULS3DLC002-E001",
+        "is_original": false,
+        "name": "Game Pack",
+        "platforms": [
+          0,
+          10,
+          13
+        ],
+        "price": 1499,
+        "rewards": [],
+        "seasonPassExclusiveFlag": false,
+        "skuAvailabilityOverrideFlag": false,
+        "sku_type": 0,
+        "type": "standard"
+      },
+      "gameContentTypesList": [
+        {
+          "name": "Map",
+          "key": "MAP"
+        }
+      ],
+      "game_contentType": "Map",
+      "id": "EP0700-CUSA03365_00-DARKSOULS3DLC002",
+      "images": [
+        {
+          "type": 1,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/TBoUAGQj13xY60PzexJiaKbyvhFxgn6c.png"
+        },
+        {
+          "type": 2,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/k8G6lRugcuLdUiG0M01K3JKyLlGJ3w6U.png"
+        },
+        {
+          "type": 9,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/TaJOIRU6UXlE5wzOaLfLaAYxDhYTNeG9.png"
+        },
+        {
+          "type": 10,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/DahHM7gdfnhQuT0HSVg5cxPf4he3TtG2.png"
+        }
+      ],
+      "name": "DARK SOULS™ III : The Ringed City™",
+      "parent_name": "DARK SOULS™ III",
+      "playable_platform": [
+        "PS4™"
+      ],
+      "provider_name": "BANDAI NAMCO ENTERTAINMENT EUROPE",
+      "release_date": "2017-03-28T00:00:00Z",
+      "restricted": false,
+      "revision": 11,
+      "short_name": "The Ringed City™",
+      "timestamp": 1492010829000,
+      "top_category": "add_on",
+      "url": "https://store.playstation.com/store/api/chihiro/00_09_000/container/IE/en/999/EP0700-CUSA03365_00-DARKSOULS3DLC002/1492010829"
+    },
+    {
+      "bucket": "games",
+      "container_type": "product",
+      "content_type": "1",
+      "default_sku": {
+        "amortizeFlag": false,
+        "bundleExclusiveFlag": false,
+        "chargeImmediatelyFlag": false,
+        "charge_type_id": 0,
+        "credit_card_required_flag": 0,
+        "defaultSku": true,
+        "display_price": "€14.99",
+        "eligibilities": [
+          {
+            "id": "EP0700-CUSA03365_00-SPASS0",
+            "operand": "IS_ACTIVE",
+            "operator": "FALSE",
+            "name": "DARK SOULS™ III - Season Pass",
+            "description": null,
+            "entitlement_type": null,
+            "drms": []
+          }
+        ],
+        "entitlements": [
+          {
+            "description": null,
+            "drms": [],
+            "duration": 0,
+            "durationOverrideTypeId": null,
+            "exp_after_first_use": 0,
+            "feature_type_id": 0,
+            "id": "EP0700-CUSA03365_00-DARKSOULS3DLC001",
+            "license_type": 0,
+            "metadata": null,
+            "name": "DARK SOULS™ III: Ashes of Ariandel™",
+            "packageType": "PS4AC",
+            "packages": [
+              {
+                "platformId": 13,
+                "platformName": "ps4",
+                "size": 1604321280
+              }
+            ],
+            "preorder_placeholder_flag": false,
+            "size": 0,
+            "subType": 0,
+            "subtitle_language_codes": null,
+            "type": 5,
+            "use_count": 0,
+            "voice_language_codes": null
+          }
+        ],
+        "id": "EP0700-CUSA03365_00-DARKSOULS3DLC001-E001",
+        "is_original": false,
+        "name": "Game Pack",
+        "platforms": [
+          0,
+          10,
+          13
+        ],
+        "price": 1499,
+        "rewards": [],
+        "seasonPassExclusiveFlag": false,
+        "skuAvailabilityOverrideFlag": false,
+        "sku_type": 0,
+        "type": "standard"
+      },
+      "gameContentTypesList": [
+        {
+          "name": "Map",
+          "key": "MAP"
+        }
+      ],
+      "game_contentType": "Map",
+      "id": "EP0700-CUSA03365_00-DARKSOULS3DLC001",
+      "images": [
+        {
+          "type": 1,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/nTdu04uezVOVJIqNY7kmxoDNDMUtn8nH.png"
+        },
+        {
+          "type": 2,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/bLFXaTWr8aE3mMMp0xhzZtruEY8wmjtW.png"
+        },
+        {
+          "type": 9,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/0cU5T2jpRmAizX4PgYlPI3iy4DoTg4nH.png"
+        },
+        {
+          "type": 10,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/B08BqeK9BfOv5PgJ6UPZeDJ4ypyiE1Lj.png"
+        }
+      ],
+      "name": "DARK SOULS™ III: Ashes of Ariandel™",
+      "parent_name": "DARK SOULS™ III",
+      "playable_platform": [
+        "PS4™"
+      ],
+      "provider_name": "BANDAI NAMCO ENTERTAINMENT EUROPE",
+      "release_date": "2016-10-25T00:00:00Z",
+      "restricted": false,
+      "revision": 12,
+      "short_name": "Ashes of Ariandel™",
+      "timestamp": 1490775709000,
+      "top_category": "add_on",
+      "url": "https://store.playstation.com/store/api/chihiro/00_09_000/container/IE/en/999/EP0700-CUSA03365_00-DARKSOULS3DLC001/1490775709"
+    },
+    {
+      "bucket": "games",
+      "cloud_only_platform": [
+        "NONE"
+      ],
+      "container_type": "product",
+      "content_type": "1",
+      "default_sku": {
+        "amortizeFlag": false,
+        "bundleExclusiveFlag": false,
+        "chargeImmediatelyFlag": false,
+        "charge_type_id": 0,
+        "credit_card_required_flag": 0,
+        "defaultSku": true,
+        "display_price": "€94.99",
+        "eligibilities": [
+          {
+            "id": "EP0700-CUSA03365_00-DARKSOULS3000000",
+            "operand": "IS_ACTIVE",
+            "operator": "FALSE",
+            "name": "DARK SOULS™ III",
+            "description": null,
+            "entitlement_type": null,
+            "drms": []
+          }
+        ],
+        "entitlements": [
+          {
+            "description": null,
+            "drms": [],
+            "duration": 0,
+            "durationOverrideTypeId": null,
+            "exp_after_first_use": 0,
+            "feature_type_id": 0,
+            "id": "EP0700-CUSA03365_00-ETH0000000000274",
+            "license_type": 0,
+            "metadata": {
+              "packageSubType": [
+                "MISC_THEME"
+              ]
+            },
+            "name": "DARK SOULS™ III: Only Embers Remain - Dynamic Theme",
+            "packageType": "PS4MISC",
+            "packages": [
+              {
+                "platformId": 13,
+                "platformName": "ps4",
+                "size": 11010048
+              }
+            ],
+            "preorder_placeholder_flag": false,
+            "size": 0,
+            "subType": 0,
+            "subtitle_language_codes": null,
+            "type": 5,
+            "use_count": 0,
+            "voice_language_codes": null
+          },
+          {
+            "description": null,
+            "drms": [],
+            "duration": 0,
+            "durationOverrideTypeId": null,
+            "exp_after_first_use": 0,
+            "feature_type_id": 3,
+            "id": "EP0700-CUSA03365_00-DARKSOULS3000000",
+            "license_type": 0,
+            "metadata": {
+              "voiceLanguageCode": [
+                "en"
+              ],
+              "subtitleLanguageCode": [
+                "de",
+                "ru",
+                "en",
+                "it",
+                "fr",
+                "pl",
+                "es"
+              ]
+            },
+            "name": "DARK SOULS™ III",
+            "packageType": "PS4GD",
+            "packages": [
+              {
+                "platformId": 13,
+                "platformName": "ps4",
+                "size": 18258001920
+              }
+            ],
+            "preorder_placeholder_flag": false,
+            "size": 0,
+            "subType": 0,
+            "subtitle_language_codes": [
+              "de",
+              "ru",
+              "en",
+              "it",
+              "fr",
+              "pl",
+              "es"
+            ],
+            "type": 5,
+            "use_count": 0,
+            "voice_language_codes": [
+              "en"
+            ]
+          },
+          {
+            "description": null,
+            "drms": [],
+            "duration": 0,
+            "durationOverrideTypeId": null,
+            "exp_after_first_use": 0,
+            "feature_type_id": 0,
+            "id": "EP0700-CUSA03365_00-SPASS0",
+            "license_type": 0,
+            "metadata": null,
+            "name": "DARK SOULS™ III - Season Pass",
+            "packageType": null,
+            "packages": [],
+            "preorder_placeholder_flag": false,
+            "size": 0,
+            "subType": 0,
+            "subtitle_language_codes": null,
+            "type": 1,
+            "use_count": 0,
+            "voice_language_codes": null
+          }
+        ],
+        "id": "EP0700-CUSA03365_00-DSIIIDELUXE00000-E001",
+        "is_original": false,
+        "name": "Full Game",
+        "platforms": [
+          0,
+          10,
+          13
+        ],
+        "price": 9499,
+        "rewards": [],
+        "seasonPassExclusiveFlag": false,
+        "skuAvailabilityOverrideFlag": false,
+        "sku_type": 0,
+        "type": "standard"
+      },
+      "gameContentTypesList": [
+        {
+          "name": "Bundle",
+          "key": "BUNDLE"
+        }
+      ],
+      "game_contentType": "Bundle",
+      "id": "EP0700-CUSA03365_00-DSIIIDELUXE00000",
+      "images": [
+        {
+          "type": 1,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/aZEGH0O5EXBhQj1h0Xn7yfUYDdQOdovA.png"
+        },
+        {
+          "type": 2,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/44PDqB7uME7GKJTPkFA5npsU62NPWPD9.png"
+        },
+        {
+          "type": 9,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/yFM10tQb9v4jqlU405dt7bI6RI304koX.png"
+        },
+        {
+          "type": 10,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/gSJkkVfpqk8qEp3fQglGcu3OLbXeHJ1W.png"
+        },
+        {
+          "type": 12,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/qsTwjS2DRCR6a4zNdB7KzYj8ToU20oKj.jpg"
+        },
+        {
+          "type": 13,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/UzXzk746RxJF125kpzhyHMPfkEILg1uw.png"
+        }
+      ],
+      "name": "DARK SOULS™ III - Deluxe Edition",
+      "parent_name": "DARK SOULS™ III",
+      "playable_platform": [
+        "PS4™"
+      ],
+      "provider_name": "BANDAI NAMCO ENTERTAINMENT EUROPE",
+      "release_date": "2016-04-12T00:00:00Z",
+      "restricted": false,
+      "revision": 17,
+      "short_name": "Deluxe Edition",
+      "timestamp": 1491549472000,
+      "top_category": "downloadable_game",
+      "url": "https://store.playstation.com/store/api/chihiro/00_09_000/container/IE/en/999/EP0700-CUSA03365_00-DSIIIDELUXE00000/1491549472"
+    },
+    {
+      "bucket": "games",
+      "cloud_only_platform": [
+        "NONE"
+      ],
+      "container_type": "product",
+      "content_type": "1",
+      "default_sku": {
+        "amortizeFlag": false,
+        "bundleExclusiveFlag": false,
+        "chargeImmediatelyFlag": false,
+        "charge_type_id": 0,
+        "credit_card_required_flag": 0,
+        "defaultSku": true,
+        "display_price": "€24.99",
+        "eligibilities": [
+          {
+            "id": "EP0700-CUSA03365_00-SPASS0",
+            "operand": "IS_ACTIVE",
+            "operator": "FALSE",
+            "name": "DARK SOULS™ III - Season Pass",
+            "description": null,
+            "entitlement_type": null,
+            "drms": []
+          }
+        ],
+        "entitlements": [
+          {
+            "description": null,
+            "drms": [],
+            "duration": 0,
+            "durationOverrideTypeId": null,
+            "exp_after_first_use": 0,
+            "feature_type_id": 0,
+            "id": "EP0700-CUSA03365_00-ETH0000000000274",
+            "license_type": 0,
+            "metadata": {
+              "packageSubType": [
+                "MISC_THEME"
+              ]
+            },
+            "name": "DARK SOULS™ III: Only Embers Remain - Dynamic Theme",
+            "packageType": "PS4MISC",
+            "packages": [
+              {
+                "platformId": 13,
+                "platformName": "ps4",
+                "size": 11010048
+              }
+            ],
+            "preorder_placeholder_flag": false,
+            "size": 0,
+            "subType": 0,
+            "subtitle_language_codes": null,
+            "type": 5,
+            "use_count": 0,
+            "voice_language_codes": null
+          },
+          {
+            "description": null,
+            "drms": [],
+            "duration": 0,
+            "durationOverrideTypeId": null,
+            "exp_after_first_use": 0,
+            "feature_type_id": 0,
+            "id": "EP0700-CUSA03365_00-SPASS0",
+            "license_type": 0,
+            "metadata": null,
+            "name": "DARK SOULS™ III - Season Pass",
+            "packageType": null,
+            "packages": [],
+            "preorder_placeholder_flag": false,
+            "size": 0,
+            "subType": 0,
+            "subtitle_language_codes": null,
+            "type": 1,
+            "use_count": 0,
+            "voice_language_codes": null
+          }
+        ],
+        "id": "EP0700-CUSA03365_00-DARKSOULS3SPASS0-E001",
+        "is_original": false,
+        "name": "Game Pack",
+        "platforms": [
+          0,
+          10,
+          13
+        ],
+        "price": 2499,
+        "rewards": [],
+        "seasonPassExclusiveFlag": false,
+        "skuAvailabilityOverrideFlag": false,
+        "sku_type": 0,
+        "type": "standard"
+      },
+      "id": "EP0700-CUSA03365_00-DARKSOULS3SPASS0",
+      "images": [
+        {
+          "type": 1,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/NvYUEcszRdoj27SbRRj0don8uMuN8dMr.png"
+        },
+        {
+          "type": 2,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/rLQNEX3VKR7YmL0UnfkzJgptYpZNHftp.png"
+        },
+        {
+          "type": 9,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/MDUFoeNWyUGAQGppbWE0b0zD1h1s3HQx.png"
+        },
+        {
+          "type": 10,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/Mw7EVFpzyWIwYy1tpcps41PzuWYNdaW5.png"
+        }
+      ],
+      "name": "DARK SOULS™ III - Season Pass",
+      "parent_name": "DARK SOULS™ III",
+      "playable_platform": [
+        "PS4™"
+      ],
+      "provider_name": "BANDAI NAMCO ENTERTAINMENT EUROPE",
+      "release_date": "2016-04-12T00:00:00Z",
+      "restricted": false,
+      "revision": 8,
+      "short_name": "Season Pass",
+      "timestamp": 1491576433000,
+      "top_category": "add_on",
+      "url": "https://store.playstation.com/store/api/chihiro/00_09_000/container/IE/en/999/EP0700-CUSA03365_00-DARKSOULS3SPASS0/1491576433"
+    },
+    {
+      "bucket": "games",
+      "cloud_only_platform": [
+        "NONE"
+      ],
+      "container_type": "product",
+      "content_type": "1",
+      "default_sku": {
+        "amortizeFlag": false,
+        "bundleExclusiveFlag": false,
+        "chargeImmediatelyFlag": false,
+        "charge_type_id": 0,
+        "credit_card_required_flag": 0,
+        "defaultSku": true,
+        "display_price": "Free",
+        "eligibilities": [],
+        "entitlements": [
+          {
+            "description": null,
+            "drms": [],
+            "duration": 0,
+            "durationOverrideTypeId": null,
+            "exp_after_first_use": 0,
+            "feature_type_id": 0,
+            "id": "EP0700-CUSA03365_00-DS3THEME00000000",
+            "license_type": 0,
+            "metadata": {
+              "packageSubType": [
+                "MISC_THEME"
+              ]
+            },
+            "name": "Dark Souls™ III Inventory Theme",
+            "packageType": "PS4MISC",
+            "packages": [
+              {
+                "platformId": 13,
+                "platformName": "ps4",
+                "size": 15663104
+              }
+            ],
+            "preorder_placeholder_flag": false,
+            "size": 0,
+            "subType": 0,
+            "subtitle_language_codes": null,
+            "type": 5,
+            "use_count": 0,
+            "voice_language_codes": null
+          }
+        ],
+        "id": "EP0700-CUSA03365_00-DS3THEME00000000-E001",
+        "is_original": false,
+        "name": "Theme",
+        "platforms": [
+          0,
+          10,
+          13
+        ],
+        "price": 0,
+        "rewards": [],
+        "seasonPassExclusiveFlag": false,
+        "skuAvailabilityOverrideFlag": false,
+        "sku_type": 0,
+        "type": "standard"
+      },
+      "gameContentTypesList": [
+        {
+          "name": "Theme",
+          "key": "THEME"
+        }
+      ],
+      "game_contentType": "Theme",
+      "id": "EP0700-CUSA03365_00-DS3THEME00000000",
+      "images": [
+        {
+          "type": 1,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/mUcrIVenlyE3JPjt0dl81XRkmBJjRQgp.png"
+        },
+        {
+          "type": 2,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/hEXaN0B7LLPuxDYuNmIpozgOf1zZyNzD.png"
+        },
+        {
+          "type": 9,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/w1oR5Z8nqnuc51kXEGhmjYpnjTsO47i3.png"
+        },
+        {
+          "type": 10,
+          "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/j3x8z8kzAVxlixFgB2rI5rzcLY5a9fmM.png"
+        }
+      ],
+      "name": "DARK SOULS™ III Inventory Theme",
+      "parent_name": "DARK SOULS™ III",
+      "playable_platform": [
+        "PS4™"
+      ],
+      "provider_name": "BANDAI NAMCO ENTERTAINMENT EUROPE",
+      "release_date": "2016-08-24T00:00:00Z",
+      "restricted": false,
+      "revision": 1,
+      "short_name": "Inventory Theme",
+      "sub_category": "other",
+      "timestamp": 1490379274000,
+      "top_category": "theme",
+      "url": "https://store.playstation.com/store/api/chihiro/00_09_000/container/IE/en/999/EP0700-CUSA03365_00-DS3THEME00000000/1490379274"
+    }
+  ],
+  "long_desc": "Get the DARK SOULS™ III Season Pass now and challenge yourself with all the available content!<br><br>Winner of gamescom award 2015 'Best RPG' and over 35 E3 2015 Awards and Nominations.<br><br>DARK SOULS™ III continues to push the boundaries with the latest, ambitious chapter in the critically-acclaimed and genre-defining series. <br><br>As fires fade and the world falls into ruin, journey into a universe filled with more colossal enemies and environments. Players will be immersed into a world of epic atmosphere and darkness through faster gameplay and amplified combat intensity. Fans and newcomers alike will get lost in the game hallmark rewarding gameplay and immersive graphics. <br>Now only embers remain… Prepare yourself once more and Embrace The Darkness!<br><br>1 player<br>Network Players 2-6 - Full game requires PlayStation®Plus membership to access online multiplayer<br>19GB minimum save size<br>DUALSHOCK®4 Vibration Function<br>Remote Play Supported<br>HD Video Output 720p,1080i,1080p<br><br>Download of this product is subject to the PlayStation Network Terms of Service and our Software Usage Terms plus any specific additional conditions applying to this product. If you do not wish to accept these terms, do not download this product. See Terms of Service for more important information.<br> One-time licence fee to download to multiple PS4 systems. Sign in to PlayStation Network is not required to use this on your primary PS4, but is required for use on other PS4 systems.<br>See Health Warnings for important health information before using this product.<br>Library programs ©Sony Interactive Entertainment Inc. exclusively licensed to Sony Interactive Entertainment Europe. Software Usage Terms apply, See eu.playstation.com/legal for full usage rights.<br><br>DARK SOULS™ III & ©BANDAI NAMCO Entertainment Inc. / ©2011-2016 FromSoftware, Inc.",
+  "mediaList": {
+    "previews": [
+      {
+        "type": "PREVIEW",
+        "typeId": 2,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTZSC20NWieRqRgYhWSSin/PREVIEW_TRAILER_VIDEO_483510.mp4",
+        "order": 0,
+        "streamUrl": "http://d1v33d7b5ul6gp.cloudfront.net/1572899/PREVIEW_TRAILER_VIDEO_483510_playlist.m3u8",
+        "shots": [
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0011.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0010.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0009.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0008.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0007.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0006.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0005.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0004.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0003.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0002.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0001.jpg",
+          "http://d1v33d7b5ul6gp.cloudfront.net/1572899/frame_0000.jpg"
+        ]
+      }
+    ],
+    "screenshots": [
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTNavElMiks1YcJgipLQSK/PREVIEW_SCREENSHOT1_483510.jpg",
+        "order": 1
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTjP1836AKBvtlGUWQ12gX/PREVIEW_SCREENSHOT2_483510.jpg",
+        "order": 2
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTIaD4V6arQ7Qf3xqC60OG/PREVIEW_SCREENSHOT3_483510.jpg",
+        "order": 3
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTR9EXm59pT5ZvmofoljeG/PREVIEW_SCREENSHOT4_483510.jpg",
+        "order": 4
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTph5CrzNfPcNtcamDTblu/PREVIEW_SCREENSHOT5_483510.jpg",
+        "order": 5
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTt0ubmgUtzvxAV2XcUyly/PREVIEW_SCREENSHOT6_483510.jpg",
+        "order": 6
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTYZdH1QlG5irR0U4Be7ho/PREVIEW_SCREENSHOT7_483510.jpg",
+        "order": 7
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTQtTmEnU47qZHqQuCMg5J/PREVIEW_SCREENSHOT8_483510.jpg",
+        "order": 8
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTYwtfiyM6gX1lmm521KHQ/PREVIEW_SCREENSHOT9_483510.jpg",
+        "order": 9
+      },
+      {
+        "type": "SCREENSHOT",
+        "typeId": 4,
+        "source": "PRODUCT_MEDIA",
+        "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTkuj80GRhQ5UnL6ef7Q8b/PREVIEW_SCREENSHOT10_483510.jpg",
+        "order": 10
+      }
+    ]
+  },
+  "media_layouts": [
+    {
+      "type": "description",
+      "height": 1,
+      "width": 4
+    }
+  ],
+  "metadata": {
+    "cn_remotePlay": {
+      "name": "cn_remotePlay",
+      "values": [
+        "TRUE"
+      ]
+    },
+    "cloud_only_platform": {
+      "name": "cloud_only_platform",
+      "values": [
+        "NONE"
+      ]
+    },
+    "cn_vrEnabled": {
+      "name": "cn_vrEnabled",
+      "values": [
+        "FALSE"
+      ]
+    },
+    "cn_playstationMove": {
+      "name": "cn_playstationMove",
+      "values": [
+        "NOTREQUIRED"
+      ]
+    },
+    "cn_wirelessController": {
+      "name": "cn_wirelessController",
+      "values": [
+        "NOTREQUIRED"
+      ]
+    },
+    "cn_videoOutput": {
+      "name": "cn_videoOutput",
+      "values": [
+        "1080i",
+        "1080p",
+        "720p"
+      ]
+    },
+    "secondary_classification": {
+      "name": "secondary_classification",
+      "values": [
+        "GAME"
+      ]
+    },
+    "game_subgenre": {
+      "name": "subgenre",
+      "values": [
+        "3D_FIGHTING",
+        "EPIC",
+        "STRATEGY_ROLE_PLAYING_GAME"
+      ]
+    },
+    "cn_numberOfNetworkPlayersPSPlus": {
+      "name": "cn_numberOfNetworkPlayersPSPlus",
+      "values": [
+        "6"
+      ]
+    },
+    "cn_vrRequired": {
+      "name": "cn_vrRequired",
+      "values": [
+        "FALSE"
+      ]
+    },
+    "game_genre": {
+      "name": "Genre",
+      "values": [
+        "ACTION",
+        "ADVENTURE",
+        "ROLE_PLAYING_GAMES"
+      ]
+    },
+    "playable_platform": {
+      "name": "playable_platform",
+      "values": [
+        "PS4™"
+      ]
+    },
+    "subgenre": {
+      "name": "subgenre",
+      "values": [
+        "3D_FIGHTING",
+        "EPIC",
+        "STRATEGY_ROLE_PLAYING_GAME"
+      ]
+    },
+    "cn_dualshockVibration": {
+      "name": "cn_dualshockVibration",
+      "values": [
+        "TRUE"
+      ]
+    },
+    "tertiary_classification": {
+      "name": "tertiary_classification",
+      "values": [
+        "NA"
+      ]
+    },
+    "container_type": {
+      "name": "Container Type",
+      "values": [
+        "NP_PS4_REPRESENTATIVE"
+      ]
+    },
+    "genre": {
+      "name": "Genre",
+      "values": [
+        "Action",
+        "Adventure",
+        "Role-Playing Games (RPG)"
+      ]
+    },
+    "cn_playstationCamera": {
+      "name": "cn_playstationCamera",
+      "values": [
+        "NOTREQUIRED"
+      ]
+    },
+    "cn_singstarMicrophone": {
+      "name": "cn_singstarMicrophone",
+      "values": [
+        "NOTREQUIRED"
+      ]
+    },
+    "cn_crossPlatformPSVita": {
+      "name": "cn_crossPlatformPSVita",
+      "values": [
+        "FALSE"
+      ]
+    },
+    "primary_classification": {
+      "name": "primary_classification",
+      "values": [
+        "PREMIUM_GAME"
+      ]
+    }
+  },
+  "name": "DARK SOULS™ III",
+  "pageTypeId": 2,
+  "playable_platform": [
+    "PS4™"
+  ],
+  "promomedia": [
+    {
+      "id": 0,
+      "key": "preview",
+      "type": 2,
+      "url": "https://apollo2.dl.playstation.net/cdn/EP0700/CUSA03365_00/FREE_CONTENTZSC20NWieRqRgYhWSSin/PREVIEW_TRAILER_VIDEO_483510.mp4?country=IE"
+    }
+  ],
+  "provider_name": "BANDAI NAMCO ENTERTAINMENT EUROPE",
+  "relationships": [
+    {
+      "count": 1,
+      "id": "BUNDLES",
+      "key_name": "bundles",
+      "name": "Bundles",
+      "url": "https://store.playstation.com/store/api/chihiro/00_09_000/container/IE/en/999/EP0700-CUSA03365_00-DARKSOULS3000000/1491549513?relationship=BUNDLES"
+    },
+    {
+      "count": 3,
+      "id": "ADD-ONS",
+      "key_name": "add-ons",
+      "name": "Add-Ons",
+      "url": "https://store.playstation.com/store/api/chihiro/00_09_000/container/IE/en/999/EP0700-CUSA03365_00-DARKSOULS3000000/1491549513?relationship=ADD-ONS"
+    },
+    {
+      "count": 1,
+      "id": "THEMES",
+      "key_name": "themes",
+      "name": "Themes",
+      "url": "https://store.playstation.com/store/api/chihiro/00_09_000/container/IE/en/999/EP0700-CUSA03365_00-DARKSOULS3000000/1491549513?relationship=THEMES"
+    }
+  ],
+  "release_date": "2016-04-12T00:00:00Z",
+  "restricted": false,
+  "revision": 20,
+  "short_name": "DARK SOULS™ III",
+  "size": 5,
+  "sku_links": [],
+  "skus": [
+    {
+      "amortizeFlag": false,
+      "bundleExclusiveFlag": false,
+      "chargeImmediatelyFlag": false,
+      "charge_type_id": 0,
+      "credit_card_required_flag": 0,
+      "defaultSku": true,
+      "display_price": "€69.99",
+      "eligibilities": [],
+      "entitlements": [
+        {
+          "description": null,
+          "drms": [],
+          "duration": 0,
+          "durationOverrideTypeId": null,
+          "exp_after_first_use": 0,
+          "feature_type_id": 3,
+          "id": "EP0700-CUSA03365_00-DARKSOULS3000000",
+          "license_type": 0,
+          "metadata": {
+            "voiceLanguageCode": [
+              "en"
+            ],
+            "subtitleLanguageCode": [
+              "de",
+              "ru",
+              "en",
+              "it",
+              "fr",
+              "pl",
+              "es"
+            ]
+          },
+          "name": "DARK SOULS™ III",
+          "packageType": "PS4GD",
+          "packages": [
+            {
+              "platformId": 13,
+              "platformName": "ps4",
+              "size": 18258001920
+            }
+          ],
+          "preorder_placeholder_flag": false,
+          "size": 0,
+          "subType": 0,
+          "subtitle_language_codes": [
+            "de",
+            "ru",
+            "en",
+            "it",
+            "fr",
+            "pl",
+            "es"
+          ],
+          "type": 5,
+          "use_count": 0,
+          "voice_language_codes": [
+            "en"
+          ]
+        }
+      ],
+      "id": "EP0700-CUSA03365_00-DARKSOULS3000000-E001",
+      "is_original": false,
+      "name": "Full Game",
+      "platforms": [
+        0,
+        10,
+        13
+      ],
+      "price": 6999,
+      "rewards": [],
+      "seasonPassExclusiveFlag": false,
+      "skuAvailabilityOverrideFlag": false,
+      "sku_type": 0,
+      "type": "standard"
+    }
+  ],
+  "sort": "static",
+  "star_rating": {
+    "total": "10316",
+    "score": "4.80",
+    "count": [
+      {
+        "star": 1,
+        "count": 234
+      },
+      {
+        "star": 2,
+        "count": 56
+      },
+      {
+        "star": 3,
+        "count": 146
+      },
+      {
+        "star": 4,
+        "count": 619
+      },
+      {
+        "star": 5,
+        "count": 9261
+      }
+    ]
+  },
+  "start": 0,
+  "timestamp": 1491549513000,
+  "title_name": "DARK SOULS III",
+  "top_category": "downloadable_game",
+  "total_results": 5
+}

@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.http import Http404
 
 from .models import Library, GameList
-from .tasks import user_update_psn_library, user_update_weighted_rating, user_update_game_thumbnails
+from .tasks import task_sync_psn_library_with_psn_store, task_update_psn_weighted_ratings, task_update_psn_game_thumbnails
 
 # Library homepage for admin user.
 INDEX_TEMPLATE_ADMIN = 'psnvalue/index_admin.html'
@@ -69,13 +69,12 @@ class GameListView(generic.ListView):
         """
         return GameList.objects.filter(library_fk=self.kwargs[GAMELIST_LIBRARY_ID_PARAM], rating_count__gte=GAMELIST_MIN_RATING_COUNT, price__gte=GAMELIST_MIN_PRICE).order_by(GAMELIST_ORDER_BY)
 
-def updatelib(request, library_id):
+def view_sync_psn_library_with_psn_store(request, library_id):
     """
-    View used for updating the game library from PSN.
+    View used for syncing the local PSN library with the PSN store.
 
-    Uses the PSN API to retrieve games that are absent from the local library and also to
-    update games that are in the library with updated info. This update is performed
-    asynchronously. Update can only be triggered through this view by an admin user.
+    This update is performed asynchronously by utilisng a celery task.
+    Update can only be triggered through this view by an admin user.
 
     Args:
         request: The HTTP request
@@ -85,17 +84,15 @@ def updatelib(request, library_id):
     """
     if not request.user.is_staff:
         raise Http404("You do not have access to this resource.")
-    user_update_psn_library.delay(library_id)
+    task_sync_psn_library_with_psn_store.delay(library_id)
     return HttpResponse("You're at the psnvalue updatelib.")
 
-def updateweightedrating(request, library_id):
+def view_update_psn_weighted_ratings(request, library_id):
     """
-    View used for updating the weighted rating for each game in the library.
+    View used for updating the weighted rating for each PSN game in the library.
 
-    Each game in the library is iterated over and the weighted rating of the game, and its
-    corresponding value are calculated and updated in the DB. This allows for changes in the
-    value formula to be applied quickly. This update is performed asynchronously. Update can
-    only be triggered through this view by an admin user.
+    This update is performed asynchronously by utilisng a celery task.
+    Update can only be triggered through this view by an admin user.
 
     Args:
         request: The HTTP request
@@ -105,16 +102,17 @@ def updateweightedrating(request, library_id):
     """
     if not request.user.is_staff:
         raise Http404("You do not have access to this resource.")
-    user_update_weighted_rating.delay(library_id)
+    task_update_psn_weighted_ratings.delay(library_id)
     return HttpResponse("You're at the psnvalue update weighted rating.")
 
-def updategamethumbs(request, library_id):
+def view_update_psn_game_thumbnails(request, library_id):
     """
-    View used for updating the stored game thumbnails.
+    View used for updating the stored PSN game thumbnails.
 
-    Each game in the library is iterated over and the game thumbnail is retrieved using the thumbnail
-    URL stored in the DB. The image at this URL is then stored in the library storage. This update is
-    performed asynchronously. Update can only be triggered through this view by an admin user.
+    Can be used if the thumbnail storage location is changed.
+
+    This update is performed asynchronously by utilisng a celery task.
+    Update can only be triggered through this view by an admin user.
 
     Args:
         request: The HTTP request
@@ -124,5 +122,5 @@ def updategamethumbs(request, library_id):
     """
     if not request.user.is_staff:
         raise Http404("You do not have access to this resource.")
-    user_update_game_thumbnails.delay(library_id)
+    task_update_psn_game_thumbnails.delay(library_id)
     return HttpResponse("You're at the psnvalue update game thumbs.")
