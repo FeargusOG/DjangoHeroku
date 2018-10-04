@@ -1,7 +1,5 @@
 import json
-import requests
 import collections
-import time
 import traceback
 import base64
 import cloudinary
@@ -10,10 +8,9 @@ import cloudinary.api
 from django.db import transaction
 from django.utils import timezone
 from datetime import datetime
-from .generic_library import GenericLibrary
 from celery.utils.log import get_task_logger
 from .psn_library_dao import PSNLibraryDAO
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from .psn_store_api import PSNStoreAPI
 
 #PSN Library Name
 PSN_MODEL_LIBRARY_NAME = 'PS4'
@@ -23,16 +20,10 @@ PSN_MODEL_RATING_DEFAULT_VALUE = 1
 PSN_MODEL_RATING_DEFAULT_COUNT = 0
 #PSN Default Age Rating
 PSN_DEFAULT_AGE_RATING = 0
-#Spacing between library api requests
-PSN_API_SPACING_LIB = 5
-#Spacing between game api requests
-PSN_API_SPACING_GAME = 2
 
 ###############################################################
 #   These elements below are part of the PSN library's JSON   #
 ###############################################################
-#PSN Library Total Results
-PSN_JSON_ELEM_TOTAL_RESULTS = 'total_results'
 #PSN Each Game JSON element
 PSN_JSON_ELEM_EACH_GAME = 'links'
 #PSN Sub-Base Game JSON element i.e. bundles etc.
@@ -45,10 +36,6 @@ PSN_JSON_ELEM_GAME_ID = 'id'
 PSN_JSON_ELEM_GAME_NAME = 'name'
 #PSN Game Full Detials URL JSON element
 PSN_JSON_ELEM_GAME_URL = 'url'
-#PSN Game Platform List JSON element
-PSN_JSON_ELEM_GAME_PFORMS = 'playable_platform'
-#PSN Game PS4 Platform Title
-PSN_JSON_ELEM_GAME_PS4_PFORM = 'PS4™'
 #PSN Game Image list JSON element
 PSN_JSON_ELEM_GAME_IMAGES = 'images'
 #PSN Game Image type JSON element
@@ -93,9 +80,10 @@ PSN_JSON_ELEM_GAME_CONTENT_NAME = 'name'
 # Element - Description of content e.g. Language
 PSN_JSON_ELEM_GAME_CONTENT_DESCR = 'description'
 
-class PSNLibrary(GenericLibrary):
+class PSNLibrary:
 
     psn_library_dao = PSNLibraryDAO()
+    psn_store_api = PSNStoreAPI()
 
     """
     Celery Task - Sync PSN library with PSN Store.
@@ -104,7 +92,7 @@ class PSNLibrary(GenericLibrary):
         """
         Syncs the local PSN library with the PSN store.
 
-        Requests the full PSN Store JSON, which contains a list of all games in
+        Requests the full PSN Store JSON, which contains a list of all PS4 games in
         the PSN Store. This JSON is then used to update the local PSN library.
 
         Args:
@@ -112,12 +100,12 @@ class PSNLibrary(GenericLibrary):
         """
         # Get the PSN Library from the DB
         psn_library = self.psn_library_dao.get_library(library_id)
-
-        if(psn_library != None):
+        print("Got the lib from the DB")
+        if psn_library != None:
             try:
                 # Get the PSN Store JSON
-                psn_lib_json = self.request_psn_lib_json(psn_library.library_url)
-
+                psn_lib_json = self.psn_store_api.request_psn_lib_json(psn_library.library_url)
+                print("Finished request to store.")
                 # Update the PSN library with the PSN Store JSON
                 self.update_psn_library(psn_library, psn_lib_json)
 
@@ -136,37 +124,29 @@ class PSNLibrary(GenericLibrary):
             library: The PSN library object from the DB.
             library_json: The full library JSON returned by the PSN Store API.
         """
-        count = 0 # TODO remove
         for simple_game_json in library_json[PSN_JSON_ELEM_EACH_GAME]:
             try:
-                if(self.game_is_valid(simple_game_json)):
-
-                    if(count >= 5): # TODO remove
-                        break
-                    count += 1
+                if self.game_is_valid(simple_game_json):
 
                     print(simple_game_json[PSN_JSON_ELEM_GAME_NAME])
                     detailed_game_json_url = simple_game_json[PSN_JSON_ELEM_GAME_URL]
-                    detailed_game_json = self.request_psn_game_json(detailed_game_json_url)
+                    detailed_game_json = self.psn_store_api.request_psn_game_json(detailed_game_json_url)
                     game = self.psn_library_dao.get_game(library, detailed_game_json[PSN_JSON_ELEM_GAME_ID])
 
-                    if(game == None):
+                    if game == None:
                         self.add_game(library, detailed_game_json, detailed_game_json_url)
                     else:
                         self.update_game(library, detailed_game_json, game)
 
-                    # Sleep for short time to space our requests to the PSN API.
-                    time.sleep(PSN_API_SPACING_GAME)
-
             except Exception as e:
                 # The PSN store has some inconsistencies. When I've seen KeyErrors for the PSN_JSON_ELEM_GAME_PRICE_BLOCK element
                 # its been because a game was still listed in the store for pre-order after it already came out. So ignore these.
-                if(PSN_JSON_ELEM_GAME_PRICE_BLOCK not in str(e)):
+                if PSN_JSON_ELEM_GAME_PRICE_BLOCK not in str(e):
                     print("Exception processing game: ", simple_game_json[PSN_JSON_ELEM_GAME_NAME])
                     traceback.print_exc()
 
         # Update Library statistics, such as std dev, for rating weighting
-        super().update_library_statistics(library)
+        self.psn_library_dao.update_library_statistics(library)
 
     @transaction.atomic
     def add_game(self, library, detailed_game_json, detailed_game_json_url):
@@ -202,7 +182,7 @@ class PSNLibrary(GenericLibrary):
         url = detailed_game_json_url
         id = detailed_game_json[PSN_JSON_ELEM_GAME_ID]
         name = detailed_game_json[PSN_JSON_ELEM_GAME_NAME]
-        thumb = self.get_psn_thumbnail(detailed_game_json[PSN_JSON_ELEM_GAME_IMAGES])
+        thumb = self.get_game_thumbnail(detailed_game_json[PSN_JSON_ELEM_GAME_IMAGES])
         thumb_datastore = self.upload_thumb_to_cloudinary(thumb)
         age = detailed_game_json[PSN_JSON_ELEM_GAME_AGERATING]
         return self.psn_library_dao.add_skeleton_game_record(id, name, url, thumb, thumb_datastore, age, library)
@@ -239,15 +219,15 @@ class PSNLibrary(GenericLibrary):
             game: The game in the PSN libray to update.
         """
         # Set the price
-        self.set_psn_game_price(game, detailed_game_json)
+        self.set_game_price(game, detailed_game_json)
         # Set the ratings (both new ratings in psn and updated weighting)
-        self.set_psn_game_ratings(library, game, detailed_game_json[PSN_JSON_ELEM_GAME_RATING_BLOCK])
+        self.set_game_ratings(library, game, detailed_game_json[PSN_JSON_ELEM_GAME_RATING_BLOCK])
         # Set the game value
-        self.set_psn_game_value(library, game)
+        self.set_game_value(library, game)
         # Update the game object in the DB
         self.psn_library_dao.update_game(game)
 
-    def set_psn_game_price(self, game, detailed_game_json):
+    def set_game_price(self, game, detailed_game_json):
         """
         Set the price details for a game in the PSN library
 
@@ -256,13 +236,13 @@ class PSNLibrary(GenericLibrary):
             detailed_game_json: The full detailed game info JSON.
         """
         game.price = detailed_game_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK][PSN_JSON_ELEM_GAME_PRICE]
-        discount_dtls_tuple = self.get_psn_game_discounts(detailed_game_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
+        discount_dtls_tuple = self.get_game_discounts(detailed_game_json[PSN_JSON_ELEM_GAME_PRICE_BLOCK])
         game.base_discount = discount_dtls_tuple.rates.base
         game.plus_discount = discount_dtls_tuple.rates.plus
         game.base_price = discount_dtls_tuple.prices.base
         game.plus_price = discount_dtls_tuple.prices.plus
 
-    def set_psn_game_ratings(self, library, game, game_rating_block_json):
+    def set_game_ratings(self, library, game, game_rating_block_json):
         """
         Set the ratings details for a game in the PSN library.
 
@@ -276,165 +256,218 @@ class PSNLibrary(GenericLibrary):
         """
         game.rating = game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] if game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_VALUE] else PSN_MODEL_RATING_DEFAULT_VALUE
         game.rating_count = game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] if game_rating_block_json[PSN_JSON_ELEM_GAME_RATING_COUNT] else PSN_MODEL_RATING_DEFAULT_COUNT
-        game.weighted_rating = self.apply_weighted_game_rating(library, game)
+        game.weighted_rating = self.determine_weighted_game_rating(library, game)
 
-    def set_psn_game_value(self, library, game):
+    def set_game_value(self, library, game):
+        """
+        Calculate and set both the PS+ and non-PS+ value for this game.
+
+        Args:
+            library: The PSN library object from the DB.
+            game: The game to set value details for.
+        """
         game.base_value_score = self.calculate_game_value(library, game, False)
         game.plus_value_score = self.calculate_game_value(library, game, True)
 
-    def get_psn_game_discounts(self, p_game_price_block_json):
+    def get_game_discounts(self, game_price_block_json):
+        """
+        Extract the details of any discounts from the detailed game JSON.
+
+        Checks for both regular discounts and also PS+ discounts.
+
+        Args:
+            game_price_block_json: The block of JSON containing the discounts data.
+        Returns:
+            namedtuple: A tuple containing the following two tuples:
+                            1) A tuple containing the discount rate for both PS+ and non-PS+.
+                            2) A tuple containing the discounted price for both PS+ and non-PS+.
+        """
         psn_discount_dtls = collections.namedtuple('psn_discount_dtls', ['rates', 'prices'])
         psn_discount_rates = collections.namedtuple('psn_discount_rates', ['base', 'plus'])
         psn_discount_prices = collections.namedtuple('psn_discount_prices', ['base', 'plus'])
         base_discount = 0
         plus_discount = 0
 
-        # Use the standard price as default, and only overwrite if there are discounts.
-        base_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_PRICE]
-        plus_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_PRICE]
+        # Use the standard game price as default, and only overwrite if there are discounts.
+        base_price = game_price_block_json[PSN_JSON_ELEM_GAME_PRICE]
+        plus_price = game_price_block_json[PSN_JSON_ELEM_GAME_PRICE]
 
         # Check if there is a discount json block
-        if (PSN_JSON_ELEM_GAME_REWARDS in p_game_price_block_json) and (p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]):
-            # Check for discounts that apply to PS and non-PS Plus members
-            if PSN_JSON_ELEM_GAME_BASE_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
-                base_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
-                base_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_PRICE]
+        if (PSN_JSON_ELEM_GAME_REWARDS in game_price_block_json) and (game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS]):
+
+            # Check for discounts that apply to PS+ and non-PS+ members
+            if PSN_JSON_ELEM_GAME_BASE_DISCOUNT in game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
+                base_discount = game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_DISCOUNT]
+                base_price = game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BASE_PRICE]
                 plus_discount = base_discount
                 plus_price = base_price
-            # Now check for discounts that apply only to PS Plus members
-            if PSN_JSON_ELEM_GAME_BONUS_DISCOUNT in p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
-                plus_discount = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_DISCOUNT]
-                plus_price = p_game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_PRICE]
 
-        discount_rates_tuple = psn_discount_rates(base=base_discount,plus=plus_discount)
-        discount_prices_tuple = psn_discount_prices(base=base_price,plus=plus_price)
-        discount_dtls_tuple = psn_discount_dtls(rates=discount_rates_tuple,prices=discount_prices_tuple)
+            # Now check for discounts that apply only to PS Plus members
+            if PSN_JSON_ELEM_GAME_BONUS_DISCOUNT in game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0]:
+                plus_discount = game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_DISCOUNT]
+                plus_price = game_price_block_json[PSN_JSON_ELEM_GAME_REWARDS][0][PSN_JSON_ELEM_GAME_BONUS_PRICE]
+
+        discount_rates_tuple = psn_discount_rates(base=base_discount, plus=plus_discount)
+        discount_prices_tuple = psn_discount_prices(base=base_price, plus=plus_price)
+        discount_dtls_tuple = psn_discount_dtls(rates=discount_rates_tuple, prices=discount_prices_tuple)
         return discount_dtls_tuple
 
-    def get_psn_thumbnail(self, p_image_list):
+    def get_game_thumbnail(self, image_list):
+        """
+        Get a thumbnail to use for the game in the PSN library.
+
+        Args:
+            image_list: The list of available thumbnails from the PSN store.
+        Returns:
+            string: Return a string containing the url to the small thumbnail in the PSN Store.
+        """
         game_thumb = None
-        for eachGameImg in p_image_list:
+        for eachGameImg in image_list:
             if eachGameImg[PSN_JSON_ELEM_GAME_IMGTYPE] == PSN_JSON_ELEM_GAME_IMGTYPE_THUMB_SML:
                 game_thumb = eachGameImg[PSN_JSON_ELEM_GAME_URL]
                 break
         return game_thumb
 
-    def upload_thumb_to_cloudinary(self, p_thumbnail_url):
-        upload_result = cloudinary.uploader.upload(p_thumbnail_url)
+    def upload_thumb_to_cloudinary(self, thumbnail_url):
+        """
+        Upload a thumbnail to the cloudinary datastore.
+
+        Take the url for a thumbnail in the PSN store and store the image in cloudinary.
+        Thumbnails will then be accessed from cloudinary when displaying the PSN libray,
+        rather than hitting the PSN store for them.
+
+        Args:
+            thumbnail_url: The url of the thumbnail to upload to cloudinary.
+        Returns:
+            string: Return the url of the image now stored in cloudinary.
+        """
+        upload_result = cloudinary.uploader.upload(thumbnail_url)
         return upload_result['url']
 
-    def game_is_valid(self, p_game_json):
+    def game_is_valid(self, game_json):
+        """
+        Check if a game is valid for addition to the PSN library.
+
+        Bundles, pre-releases etc are invalid. Different editions of
+        a game, however, are valid.
+
+        Args:
+            game_json: The simple JSON for the game from the PSN Store.
+        Returns:
+            boolean: Return true if the game is valid, else false.
+        """
         game_valid = True
         # We're just looking for base games i.e. ignore bundles etc.
-        # If a game is on sale, the bundle is (always?) on sale too.
-        # Maybe we shouldn't be.... Do some tests on this.
-        if PSN_JSON_ELEM_SUB_GAME in p_game_json:
+        if PSN_JSON_ELEM_SUB_GAME in game_json:
             game_valid = False
         # Check to make sure the game is released - otherwise we can get games without prices etc.
-        elif(self.game_is_released(p_game_json) == False):
+        elif self.game_is_released(game_json) == False:
             game_valid = False
 
         return game_valid
 
-    def game_is_on_PS4(self, p_platform_list):
-        return PSN_JSON_ELEM_GAME_PS4_PFORM in p_platform_list
+    def game_is_released(self, game_json):
+        """
+        Check if the game is released.
 
-    def game_is_released(self, p_lib_game_entry):
-        g_is_released = False
-        g_release_date = datetime.strptime(p_lib_game_entry[PSN_JSON_ELEM_RELEASE_DATE], '%Y-%m-%dT%H:%M:%SZ')
-        if(g_release_date < datetime.now()):
-            g_is_released = True
-        return g_is_released
+        Args:
+            game_json: The simple JSON for the game from the PSN Store.
+        Returns:
+            boolean: Return true if the game is released, else false.
+        """
+        is_released = False
+        release_date = datetime.strptime(game_json[PSN_JSON_ELEM_RELEASE_DATE], '%Y-%m-%dT%H:%M:%SZ')
+        if release_date < datetime.now():
+            is_released = True
+        return is_released
 
     """
     PSN Library Statistics
     """
-    # DEFAULT_GAME_PRICE - anything less than one causes division by zero errors
     DEFAULT_GAME_PRICE = 1
     DEFAULT_GAME_WEIGHTED_RATING = 1
+    RATING_COUNT_WEIGHTING = 125
 
-    # Apply a weight based on the rating deviation from the mean and the count of ratings.
-    def apply_weighted_game_rating(self, library, game):
+    def determine_weighted_game_rating(self, library, game):
+        """
+        Determine the weighted rating of a game.
+
+        The rating, the count of ratings made and the rating's deviation from the mean are factored in.
+
+        Args:
+            library: The PSN library object from the DB.
+            game: The game to determine the weighted rating for.
+        Returns:
+            float: The weighted rating for this game.
+        """
         # Determine if this game is above or below the mean rating. Necessary for applying different weighting algorithm.
         aboveMean = self.rating_above_mean(library, game)
 
-        # Determine the weight to apply to rating count.
-        countVal = (float(game.rating_count)/125)
+        # Determine how much weight to put on the rating as a result of the number of ratings.
+        ratingCountVal = (float(game.rating_count)/self.RATING_COUNT_WEIGHTING)
 
         # Determine weighting to apply based on rating deviation from the mean.
         ratingConstant = 1 if aboveMean else -1
-        ratingVal = round((float(game.rating)) * (ratingConstant+((float(game.rating) - library.library_rating_mean)/library.library_rating_stdev)),2)
+        ratingVal = round((float(game.rating)) * (ratingConstant+((float(game.rating) - library.library_rating_mean)/library.library_rating_stdev)), 2)
 
         # Apply different weights depending if the game rating is above or below mean.
         finalVal = 0
-        if(aboveMean):
-            finalVal = (ratingVal+countVal)
+        if aboveMean:
+            finalVal = (ratingVal+ratingCountVal)
         else:
-            finalVal = (ratingVal-countVal)
+            finalVal = (ratingVal-ratingCountVal)
 
         # Account for a weighted rating of zero
         return self.DEFAULT_GAME_WEIGHTED_RATING if finalVal == 0.0 else finalVal
 
-    # Calculate value based on the price and discount relative to the weighted rating.
-    def calculate_game_value(self, library, p_game_obj, p_plus):
+    def calculate_game_value(self, library, game, is_plus):
+        """
+        Calculate the value for a game.
+
+        Calculate the value based on the weighted rating, the price and the discount.
+
+        Args:
+            library: The PSN library object from the DB.
+            game: The game to determine the value for.
+            is_plus: True if we are calculating the PS+ value, else false for non-PS+.
+        """
         game_price = 0.0
         game_rating = 0.0
         discount_weight = 0.0
 
-        # Determine the final price, accounting for free games
-        if(p_plus == True):
-            game_price = p_game_obj.plus_price
+        if is_plus == True:
+            game_price = game.plus_price
         else:
-            game_price = p_game_obj.base_price
+            game_price = game.base_price
 
+        # Use DEFAULT_GAME_PRICE for anything less than 1 (stops division by zero errors).
         game_price = round(game_price if game_price > 0.0 else self.DEFAULT_GAME_PRICE)
 
         # Determine the weight to apply to the discount.
-        if(p_plus == True):
-            discount_weight = 1+(p_game_obj.plus_discount/100)
+        if is_plus == True:
+            discount_weight = 1+(game.plus_discount/100)
         else:
-            discount_weight = 1+(p_game_obj.base_discount/100)
+            discount_weight = 1+(game.base_discount/100)
 
         # Apply the discount weight to the weighted rating.
-        if(self.rating_above_mean(library, p_game_obj)):
-            game_rating = ((p_game_obj.weighted_rating)*discount_weight)*100
+        if self.rating_above_mean(library, game):
+            game_rating = ((game.weighted_rating)*discount_weight)*100
         else:
-            game_rating = ((p_game_obj.weighted_rating)/discount_weight)*100
+            game_rating = ((game.weighted_rating)/discount_weight)*100
 
         return round(1/(game_price/game_rating)*100)
 
-    def rating_above_mean(self, library, p_game_obj):
-        return (((float(p_game_obj.rating) - library.library_rating_mean)/library.library_rating_stdev) > 0)
+    def rating_above_mean(self, library, game):
+        """
+        Determine if a game's rating is above or below the mean rating for the library.
 
-    """
-    PSN API Requests
-    """
-    def request_psn_lib_json(self, p_library_url):
-        lib_total_results = self.get_psn_lib_total_results(p_library_url)
-        return self.make_psn_lib_json_api_request(p_library_url, lib_total_results)
-
-    def get_psn_lib_total_results(self, p_psn_lib_url):
-        response_json = requests.get(p_psn_lib_url+'0')
-        print("URL: ", p_psn_lib_url+'1')
-        print("Status Code for Game Count request: ", print(response_json.status_code))
-        # Sleep for short time to space our requests to the PSN API.
-        time.sleep(PSN_API_SPACING_LIB)
-        psn_lib_json = response_json.json()
-        return psn_lib_json[PSN_JSON_ELEM_TOTAL_RESULTS]
-
-    def make_psn_lib_json_api_request(self, p_psn_lib_url, p_count_to_fetch):
-        #File for testing only - live version will pull json from psn api
-        #with open('staticfiles/psnvalue/TotalPS4GameLibrary.json') as data_file:
-        #    psn_lib_json = json.load(data_file)
-        response_json = requests.get(p_psn_lib_url+str(p_count_to_fetch))
-        print("Status Code for Library List request: ", print(response_json.status_code))
-        psn_lib_json = response_json.json()
-        return psn_lib_json
-
-    def request_psn_game_json(self, detailed_game_json_url):
-        response_json = requests.get(detailed_game_json_url)
-        psn_game_json = response_json.json()
-        return psn_game_json
+        Args:
+            library: The PSN library object from the DB.
+            game: The game to determine if it is above or below the mean.
+        Returns:
+            boolean: True if above the mean, else false.
+        """
+        return (float(game.rating) - library.library_rating_mean) > 0
 
     """
     Celery Task - Update Thumbnails
@@ -456,10 +489,10 @@ class PSNLibrary(GenericLibrary):
         count = 0
 
         # Get the Library Object from the DB
-        library_obj = super().get_library_obj(p_library_id)
+        library_obj = self.psn_library_dao.get_library(p_library_id)
 
         # Get all games from the DB
-        all_games_objs = super().get_all_game_objs(library_obj)
+        all_games_objs = self.psn_library_dao.get_all_game_objs(library_obj)
 
         for each_game_obj in all_games_objs:
             print("Game: ", each_game_obj.game_name)
@@ -488,10 +521,10 @@ class PSNLibrary(GenericLibrary):
         psn_library = self.psn_library_dao.get_library(library_id)
 
         # Get all games from the DB
-        all_games = super().get_all_game_objs(psn_library)
+        all_games = self.psn_library_dao.get_all_game_objs(psn_library)
 
         for each_game in all_games:
             print("Game: ", each_game.game_name)
-            each_game.weighted_rating = self.apply_weighted_game_rating(psn_library, each_game)
-            self.set_psn_game_value(psn_library, each_game)
+            each_game.weighted_rating = self.determine_weighted_game_rating(psn_library, each_game)
+            self.set_game_value(psn_library, each_game)
             self.psn_library_dao.update_game(each_game)

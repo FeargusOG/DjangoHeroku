@@ -1,3 +1,4 @@
+from statistics import pstdev, mean
 from .models import Library, GameList, ContentDescriptors, GameContent
 from django.utils import timezone
 
@@ -18,6 +19,9 @@ class PSNLibraryDAO:
         except GameList.DoesNotExist:
             pass
         return game
+
+    def get_all_game_objs(self, p_library_obj):
+        return GameList.objects.all()
 
     def add_skeleton_game_record(self, id, name, url, thumb, thumb_datastore, age, library):
         return GameList.objects.create(game_id=id, game_name=name, json_url=url, image_url=thumb, image_datastore_url=thumb_datastore, age_rating=age, library_fk=library)
@@ -53,4 +57,3 @@ class PSNLibraryDAO:
             return mean(p_list_of_ratings)
         else:
             return DEFAULT_MEAN
-            
