@@ -100,12 +100,12 @@ class PSNLibrary:
         """
         # Get the PSN Library from the DB
         psn_library = self.psn_library_dao.get_library(library_id)
-        print("Got the lib from the DB")
+
         if psn_library != None:
             try:
                 # Get the PSN Store JSON
                 psn_lib_json = self.psn_store_api.request_psn_lib_json(psn_library.library_url)
-                print("Finished request to store.")
+
                 # Update the PSN library with the PSN Store JSON
                 self.update_psn_library(psn_library, psn_lib_json)
 
@@ -472,7 +472,7 @@ class PSNLibrary:
     """
     Celery Task - Update Thumbnails
     """
-    def upload_thumbnails_to_cloudinary(self, p_library_id):
+    def upload_thumbnails_to_cloudinary(self, library_id):
         """
         View used for updating the stored game thumbnails.
 
@@ -486,16 +486,14 @@ class PSNLibrary:
         Returns:
             The HTTP response.
         """
-        count = 0
-
         # Get the Library Object from the DB
-        library_obj = self.psn_library_dao.get_library(p_library_id)
+        library_obj = self.psn_library_dao.get_library(library_id)
 
         # Get all games from the DB
-        all_games_objs = self.psn_library_dao.get_all_game_objs(library_obj)
+        all_games = self.psn_library_dao.get_all_games()
 
-        for each_game_obj in all_games_objs:
-            print("Game: ", each_game_obj.game_name)
+        for each_game_obj in all_games:
+            print(each_game_obj.game_name)
             each_game_obj.image_datastore_url = self.upload_thumb_to_cloudinary(each_game_obj.image_url)
             super().update_game_obj(each_game_obj)
 
@@ -518,13 +516,13 @@ class PSNLibrary:
             The HTTP response.
         """
         # Get the Library Object from the DB
-        psn_library = self.psn_library_dao.get_library(library_id)
+        library = self.psn_library_dao.get_library(library_id)
 
         # Get all games from the DB
-        all_games = self.psn_library_dao.get_all_game_objs(psn_library)
+        all_games = self.psn_library_dao.get_all_games()
 
         for each_game in all_games:
-            print("Game: ", each_game.game_name)
-            each_game.weighted_rating = self.determine_weighted_game_rating(psn_library, each_game)
-            self.set_game_value(psn_library, each_game)
+            print(each_game.game_name)
+            each_game.weighted_rating = self.determine_weighted_game_rating(library, each_game)
+            self.set_game_value(library, each_game)
             self.psn_library_dao.update_game(each_game)

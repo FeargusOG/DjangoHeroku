@@ -27,7 +27,6 @@ class PSNStoreAPI:
         Returns:
             JSON: JSON containing the basic details of all games in the PSN Store.
         """
-        print("About to request total results")
         lib_total_results = self.get_psn_lib_total_results(library_url)
         time.sleep(PSN_API_SPACING_LIB)
         return self.make_psn_lib_json_api_request(library_url, lib_total_results)
